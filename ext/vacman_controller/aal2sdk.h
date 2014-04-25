@@ -1,14 +1,14 @@
 /*========================================================================*/
 /*              ADVANCED AUTHENTICATION LEVEL 2 LIBRARIES                 */
 /*------------------------------------------------------------------------*/
-/* Version      : 3.10.1                                                   */
+/* Version      : 3.13.1                                                  */
 /* Environment  : Multi-Platform                                          */
 /* Date created : 27 Jun 1999                                             */
 /* Component Id : AAL2SDK.H                                               */
 /* Description  : Kernel Functions Prototypes                             */
 /*                                                                        */
-/* Copyright(c) 2009 VASCO Data Security, Inc, VASCO Data Security        */
-/* International GmbH. All rights reserved. VASCO(R), Vacman(R),          */
+/* Copyright(c) 2012 VASCO Data Security, Inc, VASCO Data Security        */
+/* International GmbH. All rights reserved. VASCO(R), VACMAN(R),          */
 /* IDENTIKEY(R), aXsGUARD(TM), DIGIPASS(R), and "VASCO 'V' logo"(R) are   */
 /* registered or unregistered trademarks of VASCO Data Security, Inc.     */
 /* and/or VASCO Data Security International GmbH. in the U.S. and other   */
@@ -182,6 +182,7 @@
 /* 05/05/2008 |3.7.11.3|Bug Fix    |Buf Fix in emvl0DecDigitsToByteArray  */
 /*            |        |           |on 20 digits secure code              */
 /* 05/05/2008 |3.7.11.3|Bug Fix    |Default UKIS CDOL include Visa Data   */
+/* 10/05/2008 |3.7.11.4|Enhancement|AES support with THALES HSM           */
 /* 15/05/2008 |3.7.12.4|Enhancement|Software Migration Support            */
 /*            |        |           |(AAL2MigrateBlob)                     */
 /* 06/06/2008 |3.8.0.0 |Enhancement|Secure Code Generation no more        */
@@ -317,8 +318,6 @@
 /* 10/03/2010 |3.10.0  |Change     |QA index selection refactoring        */
 /* 10/03/2010 |3.10.0  |Bug Fix    |In AAL2GenQAKey, check if number of   */
 /*            |        |           |QAIndex matches number of QAHash      */
-/* 10/03/2010 |3.10.0.0|Enhance    |New STRONG_HOST_CODE_APP boolean      */
-/*            |        |           |property for Strong Host Code appli.  */
 /* 15/03/2010 |3.10.0.0|Bug Fix    |Fix initial vectors conversion from   */
 /*            |        |           |DPX app field to DIGIPASS data.       */
 /*            |        |           |Must be set with '0' instead of NULL  */
@@ -385,6 +384,114 @@
 /*            |        |           |are no more incremented in Secure Code*/
 /*            |        |           |generation, those counters are related*/
 /*            |        |           |to validation                         */
+/* 15/11/2010 |3.10.1.0|Fix        |Fixed possible crash in nCipher SEE   */
+/*            |        |           |Module for seejob see_VC_loadkey      */
+/* 17/11/2010 |3.10.2.0|Enhancement|Token derivation for eID and DPSoft   */
+/* 26/11/2010 |3.10.2.0|Fix        |Do not authorize unlock functions for */
+/*            |        |           |Static PIN applications               */
+/* 26/01/2011 |3.10.2.1|Enhancement|Derivationcode check digit            */
+/* 21/12/2010 |3.10.3.0|Fix        |The AAL2DPXGetTokenBlobs &            */
+/*            |        |           |AAL2DPXGetTokenBlobsHSM functions     */
+/*            |        |           |can have a NULL POINTER Exception     */
+/*            |        |           |when import 8 applications            */
+/* 02/02/2011 |3.10.3.0|Enhancement|OATH Challenge-Response Algorithms    */
+/*            |        |           |support (OCRA)                        */
+/* 02/03/2011 |3.10.3.0|Enhancement|HSM Token derivation for eID and DPSoft*/
+/* 08/03/2011 |3.10.3.0|Fix        |Fix OnlineSG=3 for Time+Event DIGIPASS*/
+/*            |        |           |Do not set time with DeferredData when*/
+/*            |        |           |OnlineSG != 0, it can be an event     */
+/*            |        |Fix        |Fix Signature Event synchronization   */
+/*            |        |           |when event jump over 0xFFFFFFF        */
+/* 08/03/2011 |3.10.3.0|Fix        |FIPS compliance with Eracom HSM and   */
+/*            |        |           |AES token with UNLOCKV2 application:  */
+/*            |        |           |Don't wrap UNLOCKV1 DES key.          */
+/* 17/03/2011 |3.10.3.0|Enhancement|CDOL and CARDDATA refactoring: Default*/
+/*            |        |           |values are handled separatly          */
+/* 28/03/2011 |3.10.3.0|Change     |AAL2SyncTokenBlob: Enhance synchro of */
+/*            |        |           |an initial blob with a virtual blob   */
+/* 01/04/2011 |3.10.3.0|Fix        |Fix most possible event for offline   */
+/*            |        |           |mode, handling negative offset        */
+/* 12/04/2011 |3.10.3.0|Change     | AAL2GenGenActivationCodeXErcExCmd/Rpl*/
+/*            |        |           | AAL2GenActivationCodeXErcEx          */
+/*            |        |           | AAL2SyncTokenBlobEx                  */
+/*            |        |           | are deprecated  and have been removed*/
+/* 20/04/2011 |3.10.4.0|Enhancement|Reuse the current session in          */
+/*            |        |           |AAL2SetSession if sessionHandle is    */
+/*            |        |           |equal 0		                          */
+/* 27/04/2011 |3.10.4.0|Change     |Change def and sym files to export    */
+/*            |        |           |only functions applying to a specific */
+/*            |        |           |build (Software, HSM Host, PKCS11)    */
+/* 02/05/2011 |3.10.4.0|Fix        |Refactoring of unmarshal_getkeyticket */
+/*            |        |           |and unmarshal_removekeys nCipher FM   */
+/*            |        |           |functions to destroy key ticket handle*/
+/*            |        |           |and release memory                    */
+/* 02/05/2011 |3.10.4.0|Change     |Return retCode in reply byte block    */
+/*            |        |           |when processing VC nCipher command    */
+/*            |        |           |see_VC_loadkey and see_VC_removekeys  */
+/* 02/05/2011 |3.10.4.0|Enhancement|Support of EMV functions in VC nCipher*/
+/*            |        |           |FM module                             */
+/* 10/05/2011 |3.10.4.0|Bug Fix    |In functions:                         */
+/*            |        |           | - AAL2GetTokenProperty               */
+/*            |        |           | - AAL2GetTokenInfoEx                 */
+/*            |        |           | - AAL2GetTokenSingleInfo             */
+/*            |        |           |For EVENT_VALUE and LAST_EVENT_VALUE, */
+/*            |        |           |the string value returned has to be   */
+/*            |        |           | positive (between 0 and 4294967295)  */
+/* 17/05/2011 |3.10.4.0|Change     |Removing Activation Code generation   */
+/*            |        |           |with HSM.                             */
+/* 23/06/2011 |3.11.0.0|Bug Fix    |The event counter was no more updated */
+/*            |        |           |in offline signature mode for Event Base*/
+/* 27/06/2011 |3.11.0.0|Bug Fix    |Avoid possible event replay in case of*/
+/*            |        |           |AAL2VerifyAll Online with forced event*/
+/*            |        |           |counter                               */
+/* 27/06/2011 |3.11.0.0|Change     |Removing software DIGIPASS activation */
+/*            |        |           |feature for VACMAN Controller HSM due */
+/*            |        |           |to security issues with the HSM-      */
+/*            |        |           |encrypted DIGIPASS secrets.           */
+/* 31/08/2011 |3.11.0.1|Enhancement|Add AAL2GenVerifyAllCmd/Rpl functions */
+/* 11/10/2011 |3.11.1.0|Enhancement|Support of SV8 and DPSDK 4.0          */
+/* 31/10/2011 |3.11.1.0|Fix        |Fix ERC formatting when some          */
+/*            |        |           |applications are not event based      */
+/* 03/11/2011 |3.11.1.0|Fix        |Fix ERC with counter greater than 0xFFFF */
+/* 14/11/2011 |3.11.1.0|Enhancement|New DTF properties                    */
+/* 14/11/2011 |3.11.1.0|Bug Fix    |Fix int format output for NA properties*/
+/* 23/01/2012 |3.11.1.0|Enhancement|Response CheckDigit based on ISO 7064 */
+/*            |        |           |not allowed for OATH applications     */
+/* 23/01/2012 |3.11.1.0|Enhancement|Challenge CheckDigit based on ISO 7064*/
+/*            |        |           |not allowed for OATH applications     */
+/* 12/06/2012 |3.11.2.0|Change     |AAL2SyncTokenBlob:                    */
+/*            |        |           |Synchronize the production window     */
+/*            |        |           |state between reference application   */
+/*            |        |           |and others.                           */
+/* 12/06/2012 |3.11.2.0|Enhancement|New activation data generation with   */
+/*            |        |           |random key.                           */
+/* 27/06/2012 |3.11.2.0|Change     |OCRA aphanumeric challenges are       */
+/*            |        |           |generated in uppercase.               */
+/* 27/06/2012 |3.11.2.0|Enhancement|Support M/Chip 4 EPI/MCI Card in      */
+/*            |        |           |VC CTVS                               */
+/* 14/10/20113|3.12.0.0|Enhancement|Support Enhanced  Security for HSM    */
+/*            |        |           |- AAL2GenVerifyPasswordEsCmd/Rpl      */
+/*            |        |           |- AAL2GenVerifySignatureEsCmd/Rpl     */
+/* 22/11/2013 |3.13.1.0|Enhancement|Support of multi-device activation and*/
+/*            |        |           |secure channel protocols              */
+/* 22/11/2013 |3.13.1.0|Enhancement|Support of DIGIPASS Authenticard      */
+/*            |        |           |algorithm update                      */
+/* 22/11/2013 |3.13.1.0|Enhancement|Support 5 new properties in           */
+/*            |        |           |AAL2GetTokenProperty                  */
+/* 22/11/2013 |3.13.1.0|Enhancement|Support OCRA application configured   */
+/*            |        |           |with hexadecimal challenge            */
+/* 22/11/2013 |3.13.1.0|Fix        |Fix possible DPX import issue with DPX*/
+/*            |        |           |in Unix text format on Windows        */
+/* 22/11/2013 |3.13.1.0|Fix        |Avoid switch from initial to          */
+/*            |        |           |production time window in case of     */
+/*            |        |           |offline signature validation          */
+/* 19/12/2013 |3.13.1.1|Fix        |Fix AAL2DPXGetTokenBlobsEx function   */
+/*            |        |           |to return the correct auth mode       */
+/* 19/12/2013 |3.13.1.2|Fix        |Fix AAL2DPXGetTokenBlobsEx function   */
+/*            |        |           |to valuate string null termination    */
+/*            |        |           |and output variables                  */
+/* 19/12/2013 |3.13.1.2|Fix        |Fix subkey calculation for            */
+/*            |        |           |new Authenticard algorithm with CMAC  */
 /*========================================================================*/
 
 #ifndef AAL2SDK_H
@@ -397,7 +504,6 @@
       #pragma map(AAL2DP500Test, "AA2V500")
       #pragma map(AAL2VerifyAll, "AA2VVAL")
       #pragma map(AAL2VerifyAllEs, "AA2VVALS")
-      #pragma map(AAL2VerifyAllEsEx, "AA2VALSX")
       #pragma map(AAL2VerifyAllHSM, "AA2VVALH")
       #pragma map(AAL2VerifyAllEsHSM, "AA2VVAHS")
       #pragma map(AAL2VerifyPassword, "AA2VVPD")
@@ -409,10 +515,12 @@
       #pragma map(AAL2VerifySignature, "AA2VVSG")
       #pragma map(AAL2VerifySignatureEx, "AA2VVSGE")
       #pragma map(AAL2VerifySignatureEs, "AA2VVSGS")
-      #pragma map(AAL2VerifySignatureEsEx, "AA2VSGSX")
       #pragma map(AAL2VerifySignatureHSM, "AA2VVSGH")
       #pragma map(AAL2VerifySignatureEsHSM, "AA2VVSHS")
+      #pragma map(AAL2VerifyMessageSignature, "AA2VMSG")
+      #pragma map(AAL2VerifyMessageSignatureHSM, "AA2VMSGH")
       #pragma map(AAL2GenerateChallenge, "AA2VGCL")
+      #pragma map(AAL2GenerateChallengeHSM, "AA2VGCLH")
       #pragma map(AAL2GenerateChallengeEx, "AA2VGCE")
       #pragma map(AAL2Unlock, "AA2VULK")
       #pragma map(AAL2UnlockHSM, "AA2VULKH")
@@ -435,13 +543,11 @@
       #pragma map(AAL2MigrateBlob, "AA2MGBL")
       #pragma map(AAL2MigrateBlobHSM, "AA2MGBH")
       #pragma map(AAL2MigrateBlobHSMEx, "AA2MGBHX")
-      #pragma map(AAL2GenKeySetHSM, "AA2GKSH")
       #pragma map(AAL2GenActivationCode, "AA2GACTC")
       #pragma map(AAL2GetSessionKey, "AA2GSSK")
       #pragma map(AAL2VerifyWIN, "AA2VFWIN")
       #pragma map(AAL2GenHASH, "AA2GNHSH")
       #pragma map(AAL2SyncTokenBlob, "AA2SYNTB")
-      #pragma map(AAL2SyncTokenBlobEx, "AA2SYNBE")
       #pragma map(AAL2FinalizeHSM, "AA2FHSM")
       #pragma map(AAL2InitializeHSM, "AA2IHSM")
       #pragma map(AAL2OpenSessionHSM, "AA2OSHSM")
@@ -451,28 +557,32 @@
       #pragma map(AAL2SyncTokenAndHost, "AA2STAH")
       #pragma map(AAL2SyncTokenAndHostHSM, "AA2STAHH")
       #pragma map(AAL2GenTLV, "AA2GTLV")
-      #pragma map(AAL2GenTLVEx, "AA2GTLVX")
       #pragma map(AAL2GenDPBlobHSM, "AA2GDPBH")
       #pragma map(AAL2MXGenerateChallenge, "AA2MXGC")
       #pragma map(AAL2MXVerifyPassword, "AA2MXVP")
       #pragma map(AAL2MXGenAuthChar, "AA2MXGAC")
       #pragma map(AAL2GetDerivedKeyHSM, "AA2VGDKH")
       #pragma map(AAL2GenPassword, "AA2GNPW")
+      #pragma map(AAL2GenPasswordHSM, "AA2GNPWH")
       #pragma map(AAL2GenPasswordEx, "AA2GNPWE")
       #pragma map(AAL2GenSignature, "AA2GNSG")
       #pragma map(AAL2GenSignatureEx, "AA2GNSGE")
+      #pragma map(AAL2DeriveTokenBlobs, "AA2DTB")
+      #pragma map(AAL2DeriveTokenBlobsHSM, "AA2DTBH")
       #pragma map(AAL2CINIT_APrepare, "AA2CIPC")
       #pragma map(AAL2CINIT_AProcess, "AA2CIXC")
       #pragma map(AAL2DPXInitEx, "AA2VINCE")
       #pragma map(AAL2DPXInit, "AA2VINC")
       #pragma map(AAL2DPXInitHSM, "AA2VINCH")
       #pragma map(AAL2DPXGetStaticVector, "AA2VGST")
+      #pragma map(AAL2DPXGetMessageVector, "AA2VGMV")
       #pragma map(AAL2DPXGetToken, "AA2VGTC")
       #pragma map(AAL2DPXGetTokenHSM, "AA2VGTCH")
       #pragma map(AAL2DPXGetAllToken, "AA2GATC")
       #pragma map(AAL2DPXGetAllTokenHSM, "AA2GATCH")
       #pragma map(AAL2DPXGetTokenBlobs, "AA2VGTB")
       #pragma map(AAL2DPXGetTokenBlobsHSM, "AA2VGTBH")
+      #pragma map(AAL2DPXGetTokenBlobsEx, "AA2VGTBE")
       #pragma map(AAL2DPXClose, "AA2VCLC")
       #pragma map(AAL2DPXGetErrorMsg, "AA2VDEM")
       #pragma map(AAL2GetErrorMsg, "AA2VGEM")
@@ -480,106 +590,52 @@
       #pragma map(AAL2QAGenQABlob, "AA2QGQB")
       #pragma map(AAL2QAGenQAHashData, "AA2QGQHD")
       #pragma map(AAL2QADecryptQABlob, "AA2QDQB")
+      #pragma map(AAL2QADecryptQABlobHSM, "AA2QDQBH")
       #pragma map(AAL2GenActivationCodeEx, "AA2QGACE")
+      #pragma map(AAL2GenActivationCodeExHSM, "AA2GACEH")
       #pragma map(AAL2GenActivationCodeXErc, "AA2GACXE")
       #pragma map(AAL2GenActivationCodeXErcHSM, "AA2GACXH")
+      #pragma map(AAL2GenActivationDataRndKey, "AA2GADRK")
+      #pragma map(AAL2GenActivationDataRndKeyHSM, "AA2GADRH")
       #pragma map(AAL2GenQAKey, "AA2QGQK")
-      /*********************************************************************/
-      /* SystemPrograming C                                               */
-      /*********************************************************************/
-      #ifdef USE_SPC
-        #include <spc.h>
-          #pragma runopts(TRAP(OFF))
-        #pragma environment(AAL2ResetTokenInfo)
-        #pragma environment(AAL2GetTokenInfo)
-        #pragma environment(AAL2DP500Test)
-        #pragma environment(AAL2VerifyAll)
-        #pragma environment(AAL2VerifyAllEs)
-        #pragma environment(AAL2VerifyAllEsEx)
-        #pragma environment(AAL2VerifyAllHSM)
-        #pragma environment(AAL2VerifyAllEsHSM)
-        #pragma environment(AAL2VerifyPassword)
-        #pragma environment(AAL2VerifyPasswordEs)
-        #pragma environment(AAL2VerifyPasswordEx)
-        #pragma environment(AAL2VerifyPasswordHSM)
-        #pragma environment(AAL2VerifyPasswordEsHSM)
-        #pragma environment(AAL2VerifyPasswordHash)
-        #pragma environment(AAL2VerifySignature)
-        #pragma environment(AAL2VerifySignatureEs)
-        #pragma environment(AAL2VerifySignatureEx)
-        #pragma environment(AAL2VerifySignatureEsEx)
-        #pragma environment(AAL2VerifySignatureHSM)
-        #pragma environment(AAL2VerifySignatureEsHSM)
-        #pragma environment(AAL2GenerateChallenge)
-        #pragma environment(AAL2GenerateChallengeEx)
-        #pragma environment(AAL2Unlock)
-        #pragma environment(AAL2UnlockHSM)
-        #pragma environment(AAL2GetTokenInfoEx)
-        #pragma environment(AAL2GetTokenSingleInfo)
-        #pragma environment(AAL2GetTokenInfoExHSM)
-        #pragma environment(AAL2GetTokenSingleInfoHSM)
-        #pragma environment(AAL2ResetStaticPassword)
-        #pragma environment(AAL2ResetStaticPasswordHSM)
-        #pragma environment(AAL2ChangeStaticPassword)
-        #pragma environment(AAL2ChangeStaticPasswordHSM)
-        #pragma environment(AAL2GenUnlockAuthCode)
-        #pragma environment(AAL2GenUnlockAuthCodeHSM)
-        #pragma environment(AAL2AuthorizeUnlock)
-        #pragma environment(AAL2AuthorizeUnlockHSM)
-        #pragma environment(AAL2MigrateBlob)
-        #pragma environment(AAL2MigrateBlobHSM)
-        #pragma environment(AAL2MigrateBlobHSMEx)
-        #pragma environment(AAL2GenKeySetHSM)
-        #pragma environment(AAL2GenActivationCode)
-        #pragma environment(AAL2GetSessionKey)
-        #pragma environment(AAL2VerifyWIN)
-        #pragma environment(AAL2GenHASH)
-        #pragma environment(AAL2SyncTokenBlob)
-        #pragma environment(AAL2SyncTokenBlobEx)
-        #pragma environment(AAL2FinalizeHSM)
-        #pragma environment(AAL2InitializeHSM)
-        #pragma environment(AAL2OpenSessionHSM)
-        #pragma environment(AAL2CloseSessionHSM)
-        #pragma environment(AAL2GetTokenProperty)
-        #pragma environment(AAL2SetTokenProperty)
-        #pragma environment(AAL2SyncTokenAndHost)
-        #pragma environment(AAL2SyncTokenAndHostHSM)
-        #pragma environment(AAL2GenTLV)
-        #pragma environment(AAL2GenTLVEx)
-        #pragma environment(AAL2GenDPBlobHSM)
-        #pragma environment(AAL2MXGenerateChallenge)
-        #pragma environment(AAL2MXVerifyPassword)
-        #pragma environment(AAL2MXGenAuthChar)
-        #pragma environment(AAL2GetDerivedKeyHSM)
-        #pragma environment(AAL2DPXInitEx)
-        #pragma environment(AAL2DPXInit)
-        #pragma environment(AAL2DPXInitHSM)
-        #pragma environment(AAL2DPXGetStaticVector)
-        #pragma environment(AAL2DPXGetToken)
-        #pragma environment(AAL2DPXGetTokenHSM)
-        #pragma environment(AAL2DPXGetAllToken)
-        #pragma environment(AAL2DPXGetAllTokenHSM)
-        #pragma environment(AAL2DPXGetTokenBlobs)
-        #pragma environment(AAL2DPXGetTokenBlobsHSM)
-        #pragma environment(AAL2DPXClose)
-        #pragma environment(AAL2DPXGetErrorMsg)
-        #pragma environment(AAL2GetErrorMsg)
-        #pragma environment(AAL2ConvTokenData)
-        #pragma environment(AAL2QAGenQABlob)
-        #pragma environment(AAL2QAGenQAHashData)
-        #pragma environment(AAL2QADecryptQABlob)
-        #pragma environment(AAL2GenActivationCodeEx)
-        #pragma environment(AAL2GenActivationCodeXErc)
-        #pragma environment(AAL2GenActivationCodeXErcHSM)
-        #pragma environment(AAL2GenQAKey)
-      #endif /*USE_SPC*/
+      #pragma map(AAL2GenTestPassword, "AA2GNTPW")
+      #pragma map(AAL2OpenSessionPKCS, "AA2OSPK")
+      #pragma map(AAL2SetSession, "AA2SS")
+      #pragma map(AAL2MigratePKBlob, "AA2MGPKB")
+      #ifdef _EMV
+        #pragma map(AAL2VerifyEMVCAPMode1, "AA2VEM1")
+        #pragma map(AAL2GenEMVCAPMode1, "AA2GEM1")
+        #pragma map(AAL2VerifyEMVCAPMode2, "AA2VEM2")
+        #pragma map(AAL2GenEMVCAPMode2, "AA2GEM2")
+        #pragma map(AAL2VerifyEMVCAPMode3, "AA2VEM3")
+        #pragma map(AAL2GenEMVCAPMode3, "AA2GEM3")
+        #pragma map(AAL2GenEMVBlobEx, "AA2GEMBX")
+        #pragma map(AAL2CheckIMKBlobHSM, "AA2CIBH")
+      #endif /*_EMV*/
+      #ifdef _ICSF
+        #pragma map(AAL2VerifyPasswordICSF, "AA2VVPIC")
+        #pragma map(AAL2VerifySignatureICSF, "AA2VVSIC")
+        #pragma map(AAL2ResetStaticPasswordICSF, "AA2RSPIC")
+        #pragma map(AAL2ChangeStaticPasswordICSF, "AA2CSPIC")
+        #pragma map(AAL2UnlockICSF, "AA2ULKIC")
+        #pragma map(AAL2MigrateBlobICSF, "AA2MGBIC")
+        #pragma map(AAL2MigrateBlobICSFEx, "AA2MGBIX")
+        #pragma map(AAL2SyncTokenAndHostICSF, "AA2STAHI")
+        #pragma map(AAL2VerifyAllICSF, "AA2VAIC")
+        #pragma map(AAL2AuthorizeUnlockICSF, "AA2AUKIC")
+        #pragma map(AAL2DeriveTokenBlobsICSF, "AA2DTBIC")
+        #pragma map(AAL2GenActivationDataRndKeyICSF, "AA2GADIC")
+        #pragma map(AAL2GenPasswordICSF, "AA2VGPIC")
+        #pragma map(AAL2GenSignatureICSF, "AA2VGSIC")
+        #pragma map(AAL2GenUnlockAuthCodeICSF, "AA2GUAIC")
+        #pragma map(AAL2QADecryptQABlobICSF, "AA2QDQIC")
+      #endif /*_ICSF*/
     #else
       #pragma export(AAL2ResetTokenInfo)
       #pragma export(AAL2GetTokenInfo)
       #pragma export(AAL2DP500Test)
       #pragma export(AAL2VerifyAll)
       #pragma export(AAL2VerifyAllEs)
-      #pragma export(AAL2VerifyAllEsEx)
       #pragma export(AAL2VerifyAllHSM)
       #pragma export(AAL2VerifyAllEsHSM)
       #pragma export(AAL2VerifyPassword)
@@ -590,10 +646,12 @@
       #pragma export(AAL2VerifySignature)
       #pragma export(AAL2VerifySignatureEs)
       #pragma export(AAL2VerifySignatureEx)
-      #pragma export(AAL2VerifySignatureEsEx)
       #pragma export(AAL2VerifySignatureHSM)
       #pragma export(AAL2VerifySignatureEsHSM)
+      #pragma export(AAL2VerifyMessageSignature)
+      #pragma export(AAL2VerifyMessageSignatureHSM)
       #pragma export(AAL2GenerateChallenge)
+      #pragma export(AAL2GenerateChallengeHSM)
       #pragma export(AAL2GenerateChallengeEx)
       #pragma export(AAL2Unlock)
       #pragma export(AAL2UnlockHSM)
@@ -615,13 +673,17 @@
       #pragma export(AAL2AuthorizeUnlockHSM)
       #pragma export(AAL2MigrateBlob)
       #pragma export(AAL2MigrateBlobHSM)
-      #pragma export(AAL2GenKeySetHSM)
       #pragma export(AAL2GenActivationCode)
+      #pragma export(AAL2GenActivationCodeEx)
+      #pragma export(AAL2GenActivationCodeExHSM)
+      #pragma export(AAL2GenActivationCodeXErc)
+      #pragma export(AAL2GenActivationCodeXErcHSM)
+      #pragma export(AAL2GenActivationDataRndKey)
+      #pragma export(AAL2GenActivationDataRndKeyHSM)
       #pragma export(AAL2GetSessionKey)
       #pragma export(AAL2VerifyWIN)
       #pragma export(AAL2GenHASH)
       #pragma export(AAL2SyncTokenBlob)
-      #pragma export(AAL2SyncTokenBlobEx)
       #pragma export(AAL2FinalizeHSM)
       #pragma export(AAL2InitializeHSM)
       #pragma export(AAL2OpenSessionHSM)
@@ -631,38 +693,138 @@
       #pragma export(AAL2SyncTokenAndHost)
       #pragma export(AAL2SyncTokenAndHostHSM)
       #pragma export(AAL2GenTLV)
-      #pragma export(AAL2GenTLVEx)
       #pragma export(AAL2GenDPBlobHSM)
       #pragma export(AAL2MXGenerateChallenge)
       #pragma export(AAL2MXVerifyPassword)
       #pragma export(AAL2MXGenAuthChar)
       #pragma export(AAL2GetDerivedKeyHSM)
-    	#pragma export(AAL2CINIT_APrepare)
-    	#pragma export(AAL2CINIT_AProcess)
-      #pragma export(AAL2DPXInitEx)
-      #pragma export(AAL2DPXInit)
-      #pragma export(AAL2DPXInitHSM)
-      #pragma export(AAL2DPXGetStaticVector)
-      #pragma export(AAL2DPXGetToken)
-      #pragma export(AAL2DPXGetTokenHSM)
-      #pragma export(AAL2DPXGetAllToken)
-      #pragma export(AAL2DPXGetAllTokenHSM)
-      #pragma export(AAL2DPXGetTokenBlobs)
-      #pragma export(AAL2DPXGetTokenBlobsHSM)
-      #pragma export(AAL2DPXClose)
-      #pragma export (AAL2DPXGetErrorMsg)
-      #pragma export (AAL2GetErrorMsg)
-      #pragma export (AAL2ConvTokenData)
-      #pragma export (AAL2QAGenQABlob)
-      #pragma export (AAL2QAGenQAHashData)
-      #pragma export (AAL2QADecryptQABlob)
-      #pragma export (AAL2GenActivationCodeEx)
-      #pragma export (AAL2GenActivationCodeXErc)
-      #pragma export (AAL2GenActivationCodeXErcHSM)
-      #pragma export (AAL2GenQAKey)
+      #pragma export(AAL2DeriveTokenBlobs)
+      #pragma export(AAL2DeriveTokenBlobsHSM)
+      #pragma export(AAL2OpenSessionPKCS)
+      #pragma export(AAL2SetSession)
+      #pragma export(AAL2MigratePKBlob)
+      #ifdef _EMV
+        #pragma export(AAL2VerifyEMVCAPMode1)
+        #pragma export(AAL2GenEMVCAPMode1)
+        #pragma export(AAL2VerifyEMVCAPMode2)
+        #pragma export(AAL2GenEMVCAPMode2)
+        #pragma export(AAL2VerifyEMVCAPMode3)
+        #pragma export(AAL2GenEMVCAPMode3)
+        #pragma export(AAL2GenEMVBlobEx)
+        #pragma export(AAL2CheckIMKBlobHSM)
+      #endif /*_EMV*/
     #endif /*_OEMVS*/
-
+    /*********************************************************************/
+    /* SystemPrograming C                                               */
+    /*********************************************************************/
+    #ifdef USE_SPC
+      #include <spc.h>
+        #pragma runopts(TRAP(OFF))
+      #pragma environment(AAL2ResetTokenInfo)
+      #pragma environment(AAL2GetTokenInfo)
+      #pragma environment(AAL2DP500Test)
+      #pragma environment(AAL2VerifyAll)
+      #pragma environment(AAL2VerifyAllEs)
+      #pragma environment(AAL2VerifyAllHSM)
+      #pragma environment(AAL2VerifyAllEsHSM)
+      #pragma environment(AAL2VerifyPassword)
+      #pragma environment(AAL2VerifyPasswordEs)
+      #pragma environment(AAL2VerifyPasswordEx)
+      #pragma environment(AAL2VerifyPasswordHSM)
+      #pragma environment(AAL2VerifyPasswordEsHSM)
+      #pragma environment(AAL2VerifyPasswordHash)
+      #pragma environment(AAL2VerifySignature)
+      #pragma environment(AAL2VerifySignatureEs)
+      #pragma environment(AAL2VerifySignatureEx)
+      #pragma environment(AAL2VerifySignatureHSM)
+      #pragma environment(AAL2VerifySignatureEsHSM)
+      #pragma environment(AAL2VerifyMessageSignature)
+      #pragma environment(AAL2VerifyMessageSignatureHSM)
+      #pragma environment(AAL2GenerateChallengeHSM)
+      #pragma environment(AAL2GenerateChallenge)
+      #pragma environment(AAL2GenerateChallengeEx)
+      #pragma environment(AAL2Unlock)
+      #pragma environment(AAL2UnlockHSM)
+      #pragma environment(AAL2GetTokenInfoEx)
+      #pragma environment(AAL2GetTokenSingleInfo)
+      #pragma environment(AAL2GetTokenInfoExHSM)
+      #pragma environment(AAL2GetTokenSingleInfoHSM)
+      #pragma environment(AAL2ResetStaticPassword)
+      #pragma environment(AAL2ResetStaticPasswordHSM)
+      #pragma environment(AAL2ChangeStaticPassword)
+      #pragma environment(AAL2ChangeStaticPasswordHSM)
+      #pragma environment(AAL2GenUnlockAuthCode)
+      #pragma environment(AAL2GenUnlockAuthCodeHSM)
+      #pragma environment(AAL2AuthorizeUnlock)
+      #pragma environment(AAL2AuthorizeUnlockHSM)
+      #pragma environment(AAL2MigrateBlob)
+      #pragma environment(AAL2MigrateBlobHSM)
+      #pragma environment(AAL2MigrateBlobHSMEx)
+      #pragma environment(AAL2GenActivationCode)
+      #pragma environment(AAL2GetSessionKey)
+      #pragma environment(AAL2VerifyWIN)
+      #pragma environment(AAL2GenHASH)
+      #pragma environment(AAL2SyncTokenBlob)
+      #pragma environment(AAL2FinalizeHSM)
+      #pragma environment(AAL2InitializeHSM)
+      #pragma environment(AAL2OpenSessionHSM)
+      #pragma environment(AAL2CloseSessionHSM)
+      #pragma environment(AAL2GetTokenProperty)
+      #pragma environment(AAL2SetTokenProperty)
+      #pragma environment(AAL2SyncTokenAndHost)
+      #pragma environment(AAL2SyncTokenAndHostHSM)
+      #pragma environment(AAL2GenTLV)
+      #pragma environment(AAL2GenDPBlobHSM)
+      #pragma environment(AAL2MXGenerateChallenge)
+      #pragma environment(AAL2MXVerifyPassword)
+      #pragma environment(AAL2MXGenAuthChar)
+      #pragma environment(AAL2GetDerivedKeyHSM)
+      #pragma environment(AAL2DPXInitEx)
+      #pragma environment(AAL2DPXInit)
+      #pragma environment(AAL2DPXInitHSM)
+      #pragma environment(AAL2DPXGetStaticVector)
+      #pragma environment(AAL2DPXGetMessageVector)
+      #pragma environment(AAL2DPXGetToken)
+      #pragma environment(AAL2DPXGetTokenHSM)
+      #pragma environment(AAL2DPXGetAllToken)
+      #pragma environment(AAL2DPXGetAllTokenHSM)
+      #pragma environment(AAL2DPXGetTokenBlobs)
+      #pragma environment(AAL2DPXGetTokenBlobsHSM)
+      #pragma environment(AAL2DPXGetTokenBlobsEx)
+      #pragma environment(AAL2DPXClose)
+      #pragma environment(AAL2DPXGetErrorMsg)
+      #pragma environment(AAL2GetErrorMsg)
+      #pragma environment(AAL2ConvTokenData)
+      #pragma environment(AAL2QAGenQABlob)
+      #pragma environment(AAL2QAGenQAHashData)
+      #pragma environment(AAL2QADecryptQABlob)
+      #pragma environment(AAL2QADecryptQABlobHSM)
+      #pragma environment(AAL2GenActivationCodeEx)
+      #pragma environment(AAL2GenActivationCodeExHSM)
+      #pragma environment(AAL2GenActivationCodeXErc)
+      #pragma environment(AAL2GenActivationCodeXErcHSM)
+      #pragma environment(AAL2GenActivationDataRndKey)
+      #pragma environment(AAL2GenActivationDataRndKeyHSM)
+      #pragma environment(AAL2GenQAKey)
+      #pragma environment(AAL2GenTestPassword)
+      #pragma environment(AAL2DeriveTokenBlobs)
+      #pragma environment(AAL2DeriveTokenBlobsHSM)
+      #pragma environment(AAL2OpenSessionPKCS)
+      #pragma environment(AAL2SetSession)
+      #pragma environment(AAL2MigratePKBlob)
+      #ifdef _EMV
+        #pragma environment(AAL2VerifyEMVCAPMode1)
+        #pragma environment(AAL2GenEMVCAPMode1)
+        #pragma environment(AAL2VerifyEMVCAPMode2)
+        #pragma environment(AAL2GenEMVCAPMode2)
+        #pragma environment(AAL2VerifyEMVCAPMode3)
+        #pragma environment(AAL2GenEMVCAPMode3)
+        #pragma environment(AAL2GenEMVBlobEx)
+        #pragma environment(AAL2CheckIMKBlobHSM)
+      #endif /*_EMV*/
+    #endif /*USE_SPC*/
   #endif /*__MVS__*/
+
   #ifndef C_TYPES_REDECLARATION
     #define C_TYPES_REDECLARATION    1
 typedef char                  aat_ascii;
@@ -712,10 +874,14 @@ typedef unsigned long         aat_word32;
   #define MSCHAP      2
   #define MSCHAP2     256
 
+/* Optional bitmask flags used by kernel parameters */
   #define TW_DYNAMIC_WINDOWS          0x70000000L
   #define SW_UNIT_MINUTE              0x70000000L
   #define SW_DISCRETE                 0x01000000L
 
+/* Activation flag values for Software Digipass Activation*/
+  #define ACTV_DEFAULT			      0x00000000L
+  #define ACTV_OFFLINE			      0x00000001L
 
 /*Property Value for AAL2GetTokenInfoEx and AAL2GetTokenProperty*/
   #define TOKEN_MODEL                 0x00000001L
@@ -745,9 +911,46 @@ typedef unsigned long         aat_word32;
   #define IMK_LABEL                   0x00000018L /* EMV CAP Token Only */
   #define KCV_TYPE                    0x00000019L /* EMV CAP Token Only */
   #define KCV_VALUE                   0x0000001AL /* EMV CAP Token Only */
-  #define STRONG_HOST_CODE_APP        0x0000001BL
   #define CODE_WORD                   0x0000001CL
   #define AUTH_MODE                   0x0000001DL
+  #define DERIVATION_SUPPORTED        0x0000001EL
+  #define OCRA_SUITE                  0x0000001FL
+  #define MAX_DTF_NUMBER	          0x00000021L
+  #define DTF1_MIN_LEN	              0x00000022L
+  #define DTF1_MAX_LEN	              0x00000023L
+  #define DTF1_CHK	                  0x00000024L
+  #define DTF2_MIN_LEN	              0x00000025L
+  #define DTF2_MAX_LEN	              0x00000026L
+  #define DTF2_CHK	                  0x00000027L
+  #define DTF3_MIN_LEN	              0x00000028L
+  #define DTF3_MAX_LEN	              0x00000029L
+  #define DTF3_CHK	                  0x0000002AL
+  #define DTF4_MIN_LEN	              0x0000002BL
+  #define DTF4_MAX_LEN	              0x0000002CL
+  #define DTF4_CHK	                  0x0000002DL
+  #define DTF5_MIN_LEN	              0x0000002EL
+  #define DTF5_MAX_LEN	              0x0000002FL
+  #define DTF5_CHK	                  0x00000030L
+  #define DTF6_MIN_LEN	              0x00000031L
+  #define DTF6_MAX_LEN	              0x00000032L
+  #define DTF6_CHK	                  0x00000033L
+  #define DTF7_MIN_LEN	              0x00000034L
+  #define DTF7_MAX_LEN	              0x00000035L
+  #define DTF7_CHK	                  0x00000036L
+  #define DTF8_MIN_LEN	              0x00000037L
+  #define DTF8_MAX_LEN	              0x00000038L
+  #define DTF8_CHK	                  0x00000039L
+  #define DTF9_MIN_LEN	              0x0000003AL
+  #define DTF9_MAX_LEN	              0x0000003BL
+  #define DTF9_CHK	                  0x0000003CL
+  #define DTF10_MIN_LEN	              0x0000003DL
+  #define DTF10_MAX_LEN	              0x0000003EL
+  #define DTF10_CHK	                  0x0000003FL
+  #define RESPONSE_LEN                0x00000041L
+  #define RESPONSE_FORMAT             0x00000042L
+  #define RESPONSE_CHK                0x00000043L
+  #define TIME_STEP                   0x00000044L
+  #define TRIPLE_DES_USED             0x00000045L
 
 
 /*Property Value for the Static PIN*/
@@ -784,26 +987,27 @@ typedef unsigned long         aat_word32;
 #define ITF_BYTE  0x01
 
 /* EMV Schemes - for Key derivation and Cryptogram Generation */
-#define ESA_ETC_2_1_3     0x10000213     /* Europay Test Cards (Pay Now & Pay Later Security Aspects v2.1/2.3 */
-#define ESA_2_3           0x10000230     /* Europay Security Aspects v2.3 */
-#define ESA_3_0           0x10000300     /* Europay Security Aspects v3.0 */
-#define ESA_EMV2000_8_4   0x10300042     /* Europay Security Aspects v4.0 (EMV2000 - M/Chip 4) H=8, b=4 */
-#define ESA_EMV2000_16_2  0x10300081     /* Europay Security Aspects v4.0 (EMV2000 - M/Chip 4) H=16, b=2 */
-#define ESA_EMV2000_4_10  0x10300025     /* Europay Security Aspects v4.0 (EMV2000 - M/Chip 4) H=4, b=10 */
-#define ESA_BKS_35        0x10341028     /* BANKSYS V3.5 (EMV2000) H=4, b=16 */
-#define ESA_BKS_55        0x10141000     /* BANKSYS V5.5  */
-#define ESA_BKS_56        0x10140000     /* BANKSYS V5.6  */
-#define ESA_MCHIP_2_1     0x10500000     /* Europay Security Aspects v4.0 (M/Chip 2.1) */
-#define ESA_ZENGINKYO     0x11100000	   /* Zenginkyo Card */
-#define ESA_HANDELSBANK   0x10880000     /* Handelsbank card (UKIS v3.0 variant) */
-#define ESA_UKIS_3_0      0x10810000     /* UKIS v3.0 (VISA VIS v1.2) + Visa Date */
-#define ESA_MCPA          0x10001390     /* MCPA */
-#define ESA_CLIP_0_5      0x10002050     /* CLIP Security Aspects v0.5 */
-#define ESA_SECCOS_1_0    0x10003100     /* SECCOS v1.0 */
-#define ESA_APSS_3_1_A    0x10004300     /* APSS v3.1a */
+#define ESA_ETC_2_1_3       0x10000213     /* Europay Test Cards (Pay Now & Pay Later Security Aspects v2.1/2.3 */
+#define ESA_2_3             0x10000230     /* Europay Security Aspects v2.3 */
+#define ESA_3_0             0x10000300     /* Europay Security Aspects v3.0 */
+#define ESA_EMV2000_8_4     0x10300042     /* Europay Security Aspects v4.0 (EMV2000 - M/Chip 4) H=8, b=4 */
+#define ESA_EMV2000_16_2    0x10300081     /* Europay Security Aspects v4.0 (EMV2000 - M/Chip 4) H=16, b=2 */
+#define ESA_EMV2000_4_10    0x10300025     /* Europay Security Aspects v4.0 (EMV2000 - M/Chip 4) H=4, b=10 */
+#define ESA_MCHIP_4_EPI_MCI	0x10300000	   /* Europay Security Aspects v4.0 (EPI/MCI - M/Chip 4) SKD 2.1 */
+#define ESA_BKS_35          0x10341028     /* BANKSYS V3.5 (EMV2000) H=4, b=16 */
+#define ESA_BKS_55          0x10141000     /* BANKSYS V5.5  */
+#define ESA_BKS_56          0x10140000     /* BANKSYS V5.6  */
+#define ESA_MCHIP_2_1       0x10500000     /* Europay Security Aspects v4.0 (M/Chip 2.1) */
+#define ESA_ZENGINKYO       0x11100000	   /* Zenginkyo Card */
+#define ESA_HANDELSBANK     0x10880000     /* Handelsbank Card (UKIS v3.0 variant) */
+#define ESA_UKIS_3_0        0x10810000     /* UKIS v3.0 (VISA VIS v1.2) + Visa Date */
+#define ESA_MCPA            0x10001390     /* MCPA */
+#define ESA_CLIP_0_5        0x10002050     /* CLIP Security Aspects v0.5 */
+#define ESA_SECCOS_1_0      0x10003100     /* SECCOS v1.0 */
+#define ESA_APSS_3_1_A      0x10004300     /* APSS v3.1a */
 
 
-/*Data Fields TAG For Digipass Blob Generation*/
+/*Data Fields TAG For DIGIPASS application BLOB Generation*/
 
 #define TAG_SERNUMB10		0x01
 #define TAG_UNL64KEY 		0x02
@@ -903,7 +1107,7 @@ typedef struct
   aat_ascii    LastTimeShift[6+1];    /* Last Token Time Shift     : x26 - 038 : x07 - 007 */
   aat_ascii    ErrorCount[3+1];       /* Current Error Count       : x2D - 045 : x04 - 004 */
   aat_ascii    CodeWord[8+1];         /* Binary Codeword           : x31 - 049 : x09 - 009 */
-  aat_ascii    TripleDes[3+1];        /* Triple DES flag           : x3A - 058 : x04 - 004 */
+  aat_ascii    TripleDes[3+1];        /* Triple DES Used           : x3A - 058 : x04 - 004 */
   aat_ascii    MaxInputFields[1+1];   /* Challenge/Data Fields nbr : x3E - 062 : x02 - 002 */
   aat_ascii    ResponseLength[2+1];   /* Response Length           : x40 - 064 : x03 - 003 */
   aat_ascii    ResponseType[3+1];     /* Output Type               : x43 - 067 : x04 - 004 */
@@ -914,26 +1118,26 @@ typedef struct
 /* TKernelParms Definition */
 typedef struct
   {
-  aat_int32    ParmCount;          /* Number of valid parameters in this list              */
-  aat_int32    ITimeWindow;        /* Identification Window size in nbr of time steps      */
-  aat_int32    STimeWindow;        /* Signature Window size in nbr of time steps           */
-  aat_int32    DiagLevel;          /* Requested Diagnostic Level                           */
-  aat_int32    GMTAdjust;          /* GMT Time adjustment to perform                       */
-  aat_int32    CheckChallenge;     /* Verify Challenge Corrupted (mandatory for Gordian)   */
-  aat_int32    IThreshold;         /* Identification Error Threshold                       */
-  aat_int32    SThreshold;         /* Signature Error Threshold                            */
-  aat_int32    ChkInactDays;       /* Check Inactive Days                                  */
-  aat_int32    DeriveVector;       /* Vector used to make Data Encryption unique           */
-  aat_int32    SyncWindow;         /* Synchronisation Time Window (h)                      */
-  aat_int32    OnLineSG;           /* On line  Signature                                   */
-  aat_int32    EventWindow;        /* Event Window size in nbr of iterations               */
-  aat_int32    HSMSlotId;          /* HSM Slot id uses to store DB and Transport Key       */
-  aat_int32    StorageKeyId;       /* Key Id uses to read (Decrypt) DIGIPASS Blob          */
-  aat_int32    TransportKeyId;     /* Key Id uses to write (Encrypt) DIGIPASS Blob to DB   */
-  aat_int32    StorageDeriveKey1;  /* Storage Derivation Key Part 1                        */
-  aat_int32    StorageDeriveKey2;  /* Storage Derivation Key Part 2                        */
-  aat_int32    StorageDeriveKey3;  /* Storage Derivation Key Part 3                        */
-  aat_int32    StorageDeriveKey4;  /* Storage Derivation Key Part 4                        */
+  aat_int32    ParmCount;          /* Number of valid parameters in this list               */
+  aat_int32    ITimeWindow;        /* Identification Window size in nbr of time steps       */
+  aat_int32    STimeWindow;        /* Signature Window size in nbr of time steps            */
+  aat_int32    DiagLevel;          /* Requested Diagnostic Level                            */
+  aat_int32    GMTAdjust;          /* GMT Time adjustment to perform                        */
+  aat_int32    CheckChallenge;     /* Verify Challenge Corrupted (mandatory for Gordian)    */
+  aat_int32    IThreshold;         /* Identification Error Threshold                        */
+  aat_int32    SThreshold;         /* Signature Error Threshold                             */
+  aat_int32    ChkInactDays;       /* Check Inactive Days                                   */
+  aat_int32    DeriveVector;       /* Vector used to make Data Encryption unique            */
+  aat_int32    SyncWindow;         /* Synchronisation Time Window (h)                       */
+  aat_int32    OnLineSG;           /* On line  Signature                                    */
+  aat_int32    EventWindow;        /* Event Window size in nbr of iterations                */
+  aat_int32    HSMSlotId;          /* HSM Slot id uses to store DB and Transport Key        */
+  aat_int32    StorageKeyId;       /* Key Id uses to read (Decrypt) DIGIPASS app BLOB       */
+  aat_int32    TransportKeyId;     /* Key Id uses to write (Encrypt) DIGIPASS app BLOB to DB*/
+  aat_int32    StorageDeriveKey1;  /* Storage Derivation Key Part 1                         */
+  aat_int32    StorageDeriveKey2;  /* Storage Derivation Key Part 2                         */
+  aat_int32    StorageDeriveKey3;  /* Storage Derivation Key Part 3                         */
+  aat_int32    StorageDeriveKey4;  /* Storage Derivation Key Part 4                         */
   } TKernelParms;
 
 /* TCinitHandle Definition */
@@ -1349,6 +1553,34 @@ VDS_EXPORT(aat_int32) AAL2VerifySignatureEsHSM (void          *pHSMContext,
                                                 aat_ascii     *aConfirmationCodeOut,
                                                 aat_int32     *ConfirmationCodeLenOut);
 
+/*********************************************************************/
+/* Signature Validation for application using Secure Channel protocol*/
+/*********************************************************************/
+VDS_EXPORT(aat_int32) AAL2VerifyMessageSignature ( TDigipassBlob   *DPData,                   /*I/O*/
+                                                   TKernelParms    *CallParms,                  /*I*/
+                                                   aat_int32       Reserved,                    /*I*/
+                                                   aat_ascii       *Signature,                  /*I*/
+                                                   aat_ascii       *SignedMessage,              /*I*/
+                                                   aat_int32       DeferredSignatureData,       /*I*/
+                                                   aat_ascii       *ConfirmationCode,           /*O*/
+                                                   aat_int32       *ConfirmationCodeLength);  /*I/O*/
+
+
+/*********************************************************************/
+/* Signature Validation for application using Secure Channel protocol*/
+/* HSM support                                                       */
+/*********************************************************************/
+VDS_EXPORT(aat_int32) AAL2VerifyMessageSignatureHSM ( void            *pHSMContext,                /*I*/
+                                                      TDigipassBlob   *DPData,                   /*I/O*/
+                                                      TKernelParms    *CallParms,                  /*I*/
+                                                      aat_int32       Reserved,                    /*I*/
+                                                      aat_ascii       *Signature,                  /*I*/
+                                                      aat_ascii       *SignedMessage,              /*I*/
+                                                      aat_int32       DeferredSignatureData,       /*I*/
+                                                      aat_ascii       *ConfirmationCode,           /*O*/
+                                                      aat_int32       *ConfirmationCodeLength);  /*I/O*/
+
+
 
 /*********************************************************************/
 /* Generate Challenge Using Kernel Functions                         */
@@ -1430,8 +1662,8 @@ VDS_EXPORT(aat_int32) AAL2VerifySignatureEsHSM (void          *pHSMContext,
                                      aat_int16 *appli_count,
                                      aat_ascii *appl_names,
                                      aat_int32 *token_count,
-                                     aat_ascii *Hsm_Key_names,
-                                     aat_ascii *Hsm_Key_KCV);
+                                     aat_ascii *aTransportKeyName,
+                                     aat_ascii *aTransportKeyKCV);
 
 
 /*********************************************************************/
@@ -1460,9 +1692,9 @@ VDS_EXPORT(aat_int32) AAL2VerifySignatureEsHSM (void          *pHSMContext,
   VDS_EXPORT(aat_int32)  AAL2DPXGetToken(TDPXHandle    *dpx_Handle,
                                          TKernelParms  *CallParms,
                                          aat_ascii     *Select_appl_name,
-                                         aat_ascii     *sw_out_serial_No,
-                                         aat_ascii     *sw_out_type,
-                                         aat_ascii     *sw_out_authmode,
+                                         aat_ascii     *Serial_Appli,
+                                         aat_ascii     *DIGIPASSType,
+                                         aat_ascii     *Authmode,
                                          TDigipassBlob *DPData);
 
 /*********************************************************************/
@@ -1473,12 +1705,12 @@ VDS_EXPORT(aat_int32) AAL2VerifySignatureEsHSM (void          *pHSMContext,
   VDS_EXPORT(aat_int32)  AAL2DPXGetTokenBlobs(TDPXHandle    *dpx_Handle,
                                               TKernelParms  *CallParms,
                                               aat_int16     *appli_count,
-                                              aat_ascii      sw_out_appli[8][23],
-                                              aat_ascii     *sw_out_type,
-                                              aat_ascii      sw_out_authmode[8][2],
+                                              aat_ascii      Serial_Appli[8][23],
+                                              aat_ascii     *DIGIPASSType,
+                                              aat_ascii      Authmode[8][2],
                                               TDigipassBlob  DPData[8]);
 
-/*********************************************************************/
+  /*********************************************************************/
 /* Obtain multiple Description & Data Blocks for a Digipass from DPX */
 /* File, 8 max                                                       */
 /*********************************************************************/
@@ -1487,9 +1719,9 @@ VDS_EXPORT(aat_int32) AAL2VerifySignatureEsHSM (void          *pHSMContext,
                                                  TDPXHandle    *dpx_Handle,
                                                  TKernelParms  *CallParms,
                                                  aat_int16     *appli_count,
-                                                 aat_ascii      sw_out_appli[8][23],
-                                                 aat_ascii     *sw_out_type,
-                                                 aat_ascii      sw_out_authmode[8][2],
+                                                 aat_ascii      Serial_Appli[8][23],
+                                                 aat_ascii     *DIGIPASSType,
+                                                 aat_ascii      Authmode[8][2],
                                                  TDigipassBlob  DPData[8]);
 
 
@@ -1500,9 +1732,9 @@ VDS_EXPORT(aat_int32) AAL2VerifySignatureEsHSM (void          *pHSMContext,
                                                TDPXHandle    *dpx_Handle,
                                                TKernelParms  *CallParms,
                                                aat_ascii     *Select_appl_name,
-                                               aat_ascii     *sw_out_serial_No,
-                                               aat_ascii     *sw_out_type,
-                                               aat_ascii     *sw_out_authmode,
+                                               aat_ascii     *Serial_Appli,
+                                               aat_ascii     *DIGIPASSType,
+                                               aat_ascii     *Authmode,
                                                TDigipassBlob *DPData);
 
 /*********************************************************************/
@@ -1524,7 +1756,7 @@ VDS_EXPORT(aat_int32) AAL2VerifySignatureEsHSM (void          *pHSMContext,
                                             TKernelParms  *CallParms,
                                             aat_ascii     *CINIDataRecord,
                                             aat_ascii     *Serial,
-                                            aat_ascii     *DigipassType,
+                                            aat_ascii     *DIGIPASSType,
                                             aat_ascii     *AuthMode,
                                             TDigipassBlob *DPData);
 
@@ -1599,7 +1831,8 @@ VDS_EXPORT(aat_int32) AAL2VerifyPasswordHash(TDigipassBlob *DPData,
                                       aat_word32    CheckDigit);
 
 /*********************************************************************/
-/* Generate ActivationCode  for DPSoft                               */
+/* (Deprecated, this function must not be used)                      */
+/* Returns 1100 "Function not supported"                             */
 /*********************************************************************/
   VDS_EXPORT(aat_int32) AAL2GenActivationCode(TDigipassBlob *DPData,
                                               TKernelParms  *CallParms,
@@ -1647,7 +1880,7 @@ VDS_EXPORT(aat_int32) AAL2VerifyPasswordHash(TDigipassBlob *DPData,
                                                             aat_ascii     *aChallengeIn,
                                                             aat_ascii     *aCESPR);
 /*********************************************************************/
-/* Change Encrypted Static Password HSM Version                                */
+/* Change Encrypted Static Password HSM Version                      */
 /*********************************************************************/
   VDS_EXPORT(aat_int32) AAL2ChangeEncryptedStaticPasswordHSM (void          *pHSMContext,
                                                               TDigipassBlob *DPData,
@@ -1687,20 +1920,16 @@ VDS_EXPORT(aat_int32) AAL2VerifyPasswordHash(TDigipassBlob *DPData,
                                             TKernelParms  *CallParms,
                                             TDigipassInfoEx *DPInfo);
 
-/************************************************************************/
-/* Synchonise Time drift Information for a Digipass from n TDigipassBlob*/
-/************************************************************************/
-VDS_EXPORT(aat_int32) AAL2SyncTokenBlobEx(aat_byte       bDPData[8*TDigipassBlobSize],
-                                          aat_int16      appl_count,
-                                          TKernelParms   *CallParms);
-
+/*************************************************************************/
+/* Synchronize Time drift Information for a Digipass from n TDigipassBlob*/
+/*************************************************************************/
 VDS_EXPORT(aat_int32) AAL2SyncTokenBlob(TDigipassBlob *DPData[8],
                                         aat_int16     appl_count,
                                         TKernelParms  *CallParms);
 
-/*************************************************************************/
-/* Synchonise Event based or Time based algo for a Digipass TDigipassBlob*/
-/*************************************************************************/
+/**************************************************************************/
+/* Synchronize Event based or Time based algo for a Digipass TDigipassBlob*/
+/**************************************************************************/
   VDS_EXPORT(aat_int32) AAL2SyncTokenAndHost(TDigipassBlob *DPData,
                                              TKernelParms  *CallParms,
                                              aat_ascii     *aResponse1In,
@@ -1729,77 +1958,69 @@ VDS_EXPORT(aat_int32) AAL2SyncTokenBlob(TDigipassBlob *DPData[8],
 
 
 
-/*********************************************************************/
-/* Generate Keys set and encrypt it with transport Key               */
-/*********************************************************************/
-  VDS_EXPORT(aat_int32) AAL2GenKeySetHSM( void          *pHSMContext,
-                                          aat_ascii     *sw_serial_No,
-                                          TKernelParms  *CallParms,
-                                          aat_byte      bEncrytedKeySet[160]);
-
-/*********************************************************************/
-/* Function uses to change the encryption key of the DIGIPASS Blob   */
-/* without changing the values. This is used for changing DB keys or */
-/* for changing Transport key to DB key (On line Blob Generation)    */
-/*********************************************************************/
+/**********************************************************************/
+/* Function uses to change the encryption key of the DIGIPASS app BLOB*/
+/* without changing the values. This is used for changing DB keys or  */
+/* for changing Transport key to DB key (On line Blob Generation)     */
+/**********************************************************************/
   VDS_EXPORT(aat_int32) AAL2MigrateBlobHSM( void          *pHSMContext,
                                             TDigipassBlob *DPData,
                                             TKernelParms  *CallParms);
 
-/*********************************************************************/
-/* Function uses to change the encryption key of the DIGIPASS Blob   */
-/* without changing the values. This is used for changing DB keys or */
-/* for changing Transport key to DB key (On line Blob Generation)    */
-/*********************************************************************/
+/**********************************************************************/
+/* Function uses to change the encryption key of the DIGIPASS app BLOB*/
+/* without changing the values. This is used for changing DB keys or  */
+/* for changing Transport key to DB key (On line Blob Generation)     */
+/**********************************************************************/
   VDS_EXPORT(aat_int32) AAL2MigrateBlobHSMEx( void        *pHSMContext,
                                             TDigipassBlob *DPData,
                                             TKernelParms  *CallParms,
-                                            aat_ascii     *aSessionKeyKCVIn);
+                                            aat_ascii     *aTransportKeyKCVIn);
 
-/*#ifdef _PKCS11*/
+
 /*********************************************************************/
-/* Function used to open an VC HSM Session (PKCS/Thales)             */
+/* Function used to open an VC HSM Session (VC for PKCS#11)          */
 /*********************************************************************/
 
   VDS_EXPORT(aat_int32) AAL2OpenSessionPKCS(void          *pHSMContext,
                                             TKernelParms  *CallParms,
-                                            void          *pInitInfo,
+                                            void          *pReserved,
                                             aat_ascii     *userID,
-                                            aat_ascii     *storageKeyLabel,
-                                            aat_ascii     *transportKeyLabel);
+                                            aat_ascii     *aEncryptionKeyNameIn,
+                                            aat_ascii     *aDecryptionKeyNameIn);
 
 /*********************************************************************/
-/* This function set session structure parameter (PKCS/Thales)       */
+/* This function set session structure parameter (VC for PKCS#11)    */
 /*********************************************************************/
   VDS_EXPORT(aat_int32) AAL2SetSession( void          *pHSMContext,
                                         TKernelParms  *CallParms,
-                                        void          *pInitInfo,
+                                        void          *pReserved,
                                         aat_int32     sessionHandle,
-                                        aat_ascii     *storageKeyLabel,
-                                        aat_ascii     *transportKeyLabel);
+                                        aat_ascii     *aEncryptionKeyNameIn,
+                                        aat_ascii     *aDecryptionKeyNameIn);
 
-/*#endif*/
+
 
 
 /*********************************************************************/
-/* Function uses to Open an VC HSM Sesssion                          */
+/* (Deprecated)                                                      */
 /*********************************************************************/
   VDS_EXPORT(aat_int32) AAL2OpenSessionHSM(void          **pHSMContext,
                                            TKernelParms  *CallParms,
                                            void          *InitInfo);
 
 /*********************************************************************/
-/* Function uses to Close an VC HSM Sesssion                         */
+/* Function uses to Close an VC HSM Sesssion (VC for PKCS#11)        */
 /*********************************************************************/
   VDS_EXPORT(aat_int32) AAL2CloseSessionHSM(void *pHSMContext);
 
 /*********************************************************************/
-/*Initialize VC HSM Application, has to be called once               */
+/*Initialize VC HSM Application, has to be called once (VC for PKCS#11)*/
 /*********************************************************************/
   VDS_EXPORT(aat_int32) AAL2InitializeHSM(void*pReserved);
 
 /*********************************************************************/
-/*Finalize VC HSM Application, has to be called once               */
+/*Finalize VC HSM Application, has to be called once (VC for PKCS#11)*/
 /*********************************************************************/
   VDS_EXPORT(aat_int32) AAL2FinalizeHSM(void*pReserved);
 
@@ -1856,17 +2077,6 @@ VDS_EXPORT(aat_int32) AAL2SyncTokenBlob(TDigipassBlob *DPData[8],
                                               TKernelParms  *CallParms,
                                               aat_int32      Property,
                                               aat_ascii     *Value);
-
-/*********************************************************************/
-/* Synchonise Digipass Event and Blob Event from                     */
-/* two concecutive Responses                                         */
-/*********************************************************************/
-  VDS_EXPORT(aat_int32) AAL2SyncTokenEvent(TDigipassBlob *DPData,
-                                           TKernelParms  *CallParms,
-                                           aat_ascii     *aResponse1In,
-                                           aat_ascii     *aChallenge1In,
-                                           aat_ascii     *aResponse2In,
-                                           aat_ascii     *aChallenge2In);
 
 /*********************************************************************/
 /* Response Generation Using Kernel Functions                        */
@@ -1965,7 +2175,7 @@ VDS_EXPORT(aat_int32) AAL2GetDerivedKeyHSM( void          *HSMHandle,
 /*********************************************************************/
 /* HSM Replacement functions for AAL2GetDerivedKeyHSM                */
 /*********************************************************************/
-VDS_EXPORT(aat_int32) AAL2GenGetDerivedKeyCmd(aat_byte      *InCmd,
+VDS_EXPORT(aat_int32) AAL2GenGetDerivedKeyCmd(aat_byte      *Cmd,
                                               aat_int32     *CmdSize,
                                               TKernelParms  *CallParms,
                                               aat_word32     DerivationScheme,
@@ -1986,14 +2196,14 @@ VDS_EXPORT(aat_int32) AAL2ProcGetDerivedKeyRpl( aat_byte     *InReply,
 /* HSM Replacement functions for AAL2VerifyPassword                  */
 /*********************************************************************/
 
-VDS_EXPORT(aat_int32) AAL2GenVerifyPasswordCmd( aat_byte      *InCmd,
+VDS_EXPORT(aat_int32) AAL2GenVerifyPasswordCmd( aat_byte      *Cmd,
                                                 aat_int32     *CmdSize,
                                                 TDigipassBlob *DPData,
                                                 TKernelParms  *CallParms,
                                                 aat_ascii     *aResponseIn,
                                                 aat_ascii     *aChallengeIn);
 
-VDS_EXPORT(aat_int32) AAL2GenVerifyPasswordCmdEx( aat_byte      *InCmd,
+VDS_EXPORT(aat_int32) AAL2GenVerifyPasswordCmdEx( aat_byte      *Cmd,
                                                   aat_int32     *CmdSize,
                                                   TDigipassBlob *DPData,
                                                   TKernelParms  *CallParms,
@@ -2008,11 +2218,27 @@ VDS_EXPORT(aat_int32) AAL2ProcVerifyPasswordRpl(aat_byte      *InReply,
                                                 aat_ascii     *aReturnHostCodeOut,
                                                 aat_int32     *ReturnHostCodeLenOut);
 
+VDS_EXPORT(aat_int32) AAL2GenVerifyPasswordEsCmd(aat_byte      *Cmd,
+                                                 aat_int32     *CmdSize,
+                                                 TDigipassBlob *DPData,
+                                                 TKernelParms  *CallParms,
+                                                 aat_ascii     *aStorageKeyNameIn,
+                                                 aat_ascii     *aIVIn,
+                                                 aat_ascii     *aResponseIn,
+                                                 aat_ascii     *aChallengeIn,
+                                                 aat_ascii     *aServerPublicKey);
+
+VDS_EXPORT(aat_int32) AAL2ProcVerifyPasswordEsRpl(aat_byte      *InReply,
+                                                  aat_int32      ReplySize,
+                                                  TDigipassBlob *DPData,
+                                                  aat_ascii     *aReturnHostCodeOut,
+                                                  aat_int32     *ReturnHostCodeLenOut);
+
 /*********************************************************************/
-/* HSM Replacement functions for AAL2GenerateChallenge               */
+/* (Deprecated)                                                      */
 /*********************************************************************/
 
-VDS_EXPORT(aat_int32) AAL2GenGenerateChallengeCmd( aat_byte      *InCmd,
+VDS_EXPORT(aat_int32) AAL2GenGenerateChallengeCmd( aat_byte      *Cmd,
                                                    aat_int32     *CmdSize,
                                                    TDigipassBlob *DPData,
                                                    TKernelParms  *CallParms,
@@ -2029,7 +2255,7 @@ VDS_EXPORT(aat_int32) AAL2ProcGenerateChallengeRpl( aat_byte      *InReply,
 /* HSM Replacement functions for AAL2GenPassword                     */
 /*********************************************************************/
 
-VDS_EXPORT(aat_int32) AAL2GenGenPasswordCmd(aat_byte      *InCmd,
+VDS_EXPORT(aat_int32) AAL2GenGenPasswordCmd(aat_byte      *Cmd,
                                             aat_int32     *CmdSize,
                                             TDigipassBlob *DPData,
                                             TKernelParms  *CallParms,
@@ -2048,7 +2274,7 @@ VDS_EXPORT(aat_int32) AAL2ProcGenPasswordRpl( aat_byte      *InReply,
 /* HSM Replacement functions for AAL2GenSignature                    */
 /*********************************************************************/
 
-VDS_EXPORT(aat_int32) AAL2GenGenSignatureCmd( aat_byte      *InCmd,
+VDS_EXPORT(aat_int32) AAL2GenGenSignatureCmd( aat_byte      *Cmd,
                                               aat_int32     *CmdSize,
                                               TDigipassBlob *DPData,
                                               TKernelParms  *CallParms,
@@ -2070,7 +2296,7 @@ VDS_EXPORT(aat_int32) AAL2ProcGenSignatureRpl(aat_byte      *InReply,
 /*********************************************************************/
 
 
-VDS_EXPORT(aat_int32) AAL2GenCheckIMKBlobCmd(   aat_byte      *InCmd,
+VDS_EXPORT(aat_int32) AAL2GenCheckIMKBlobCmd(   aat_byte      *Cmd,
                                                 aat_int32     *CmdSize,
 												TDigipassBlob *DPData,
                                                 TKernelParms  *CallParms);
@@ -2083,7 +2309,7 @@ VDS_EXPORT(aat_int32) AAL2ProcCheckIMKBlobRpl(  aat_byte      *InReply,
 /* HSM Replacement functions for AAL2VerifyEMVCAPMode1               */
 /*********************************************************************/
 
-VDS_EXPORT(aat_int32) AAL2GenVerifyEMVCAPMode1Cmd(  aat_byte      *InCmd,
+VDS_EXPORT(aat_int32) AAL2GenVerifyEMVCAPMode1Cmd(  aat_byte      *Cmd,
                                                     aat_int32     *CmdSize,
                                                     TDigipassBlob *DPData,
                                                     TKernelParms  *CallParms,
@@ -2105,7 +2331,7 @@ VDS_EXPORT(aat_int32) AAL2ProcVerifyEMVCAPMode1Rpl( aat_byte      *InReply,
 /* HSM Replacement functions for AAL2VerifyEMVCAPMode2               */
 /*********************************************************************/
 
-VDS_EXPORT(aat_int32) AAL2GenVerifyEMVCAPMode2Cmd(aat_byte      *InCmd,
+VDS_EXPORT(aat_int32) AAL2GenVerifyEMVCAPMode2Cmd(aat_byte      *Cmd,
                                                   aat_int32     *CmdSize,
                                                   TDigipassBlob *DPData,
                                                   TKernelParms  *CallParms,
@@ -2126,7 +2352,7 @@ VDS_EXPORT(aat_int32) AAL2ProcVerifyEMVCAPMode2Rpl(aat_byte      *InReply,
 /* HSM Replacement functions for AAL2VerifyEMVCAPMode3               */
 /*********************************************************************/
 
-VDS_EXPORT(aat_int32) AAL2GenVerifyEMVCAPMode3Cmd(  aat_byte      *InCmd,
+VDS_EXPORT(aat_int32) AAL2GenVerifyEMVCAPMode3Cmd(  aat_byte      *Cmd,
                                                     aat_int32     *CmdSize,
                                                     TDigipassBlob *DPData,
                                                     TKernelParms  *CallParms,
@@ -2146,7 +2372,7 @@ VDS_EXPORT(aat_int32) AAL2ProcVerifyEMVCAPMode3Rpl( aat_byte      *InReply,
 /* HSM Replacement functions for AAL2GenEMVCAPMode1                  */
 /*********************************************************************/
 
-VDS_EXPORT(aat_int32) AAL2GenGenEMVCAPMode1Cmd(  aat_byte      *InCmd,
+VDS_EXPORT(aat_int32) AAL2GenGenEMVCAPMode1Cmd(  aat_byte      *Cmd,
                                                  aat_int32     *CmdSize,
                                                  TDigipassBlob *DPData,
                                                  TKernelParms  *CallParms,
@@ -2168,7 +2394,7 @@ VDS_EXPORT(aat_int32) AAL2ProcGenEMVCAPMode1Rpl( aat_byte      *InReply,
 /* HSM Replacement functions for AAL2GenEMVCAPMode2                  */
 /*********************************************************************/
 
-VDS_EXPORT(aat_int32) AAL2GenGenEMVCAPMode2Cmd(aat_byte      *InCmd,
+VDS_EXPORT(aat_int32) AAL2GenGenEMVCAPMode2Cmd(aat_byte      *Cmd,
                                                aat_int32     *CmdSize,
                                                TDigipassBlob *DPData,
                                                TKernelParms  *CallParms,
@@ -2189,7 +2415,7 @@ VDS_EXPORT(aat_int32) AAL2ProcGenEMVCAPMode2Rpl(aat_byte      *InReply,
 /* HSM Replacement functions for AAL2GenEMVCAPMode3                  */
 /*********************************************************************/
 
-VDS_EXPORT(aat_int32) AAL2GenGenEMVCAPMode3Cmd(  aat_byte      *InCmd,
+VDS_EXPORT(aat_int32) AAL2GenGenEMVCAPMode3Cmd(  aat_byte      *Cmd,
                                                  aat_int32     *CmdSize,
                                                  TDigipassBlob *DPData,
                                                  TKernelParms  *CallParms,
@@ -2209,7 +2435,7 @@ VDS_EXPORT(aat_int32) AAL2ProcGenEMVCAPMode3Rpl( aat_byte      *InReply,
 /* HSM Replacement functions for AAL2VerifySignature                 */
 /*********************************************************************/
 
-VDS_EXPORT(aat_int32) AAL2GenVerifySignatureCmd(aat_byte      *InCmd,
+VDS_EXPORT(aat_int32) AAL2GenVerifySignatureCmd(aat_byte      *Cmd,
                                                 aat_int32     *CmdSize,
                                                 TDigipassBlob *DPData,
                                                 TKernelParms  *CallParms,
@@ -2218,7 +2444,7 @@ VDS_EXPORT(aat_int32) AAL2GenVerifySignatureCmd(aat_byte      *InCmd,
                                                 aat_int32      FieldCountIn,
                                                 aat_int32      DeferredSignatureDataIn);
 
-VDS_EXPORT(aat_int32) AAL2GenVerifySignatureCmdEx(aat_byte      *InCmd,
+VDS_EXPORT(aat_int32) AAL2GenVerifySignatureCmdEx(aat_byte      *Cmd,
                                                 aat_int32     *CmdSize,
                                                 TDigipassBlob *DPData,
                                                 TKernelParms  *CallParms,
@@ -2235,18 +2461,101 @@ VDS_EXPORT(aat_int32) AAL2ProcVerifySignatureRpl(aat_byte      *InReply,
                                                  aat_ascii     *aReturnHostCodeOut,
                                                  aat_int32     *ReturnHostCodeLenOut);
 
+VDS_EXPORT(aat_int32) AAL2GenVerifySignatureEsCmd(aat_byte      *Cmd,
+                                                  aat_int32     *CmdSize,
+                                                  TDigipassBlob *DPData,
+                                                  TKernelParms  *CallParms,
+                                                  aat_ascii     *aStorageKeyNameIn,
+                                                  aat_ascii     *aIVIn,
+                                                  aat_ascii     *aSignatureIn,
+                                                  aat_ascii     *aSignedDataFieldsIn[8],
+                                                  aat_int32     FieldCountIn,
+                                                  aat_int32     DeferredSignatureDataIn,
+                                                  aat_ascii     *aServerPublicKey);
+
+VDS_EXPORT(aat_int32)  AAL2ProcVerifySignatureEsRpl(aat_byte      *InReply,
+                                                    aat_int32      ReplySize,
+                                                    TDigipassBlob *DPData,
+                                                    aat_ascii     *aReturnHostCodeOut,
+                                                    aat_int32     *ReturnHostCodeLenOut);
+
+
+
+
+/*********************************************************************/
+/* HSM replacement for AAL2VerifyMessageSignature using with Secure  */
+/* Channel protocol                                                  */
+/*********************************************************************/
+VDS_EXPORT(aat_int32) AAL2GenVerifyMessageSignatureCmd( aat_byte        *Cmd,                      /*O*/
+                                                        aat_int32       *CmdSize,                /*I/O*/
+                                                        TDigipassBlob   *DPData,                   /*I*/
+                                                        TKernelParms    *CallParms,                /*I*/
+                                                        aat_ascii       *aStorageKeyNameIn,           /*I*/
+                                                        aat_ascii       *aIVIn,                    /*I*/
+                                                        aat_int32       Reserved,                  /*I*/
+                                                        aat_ascii       *Signature,                /*I*/
+                                                        aat_ascii       *SignedMessage,            /*I*/
+                                                        aat_int32       DeferredSignatureData);    /*I*/
+
+VDS_EXPORT(aat_int32) AAL2ProcVerifyMessageSignatureRpl(aat_byte        *InReply,                    /*I*/
+                                                        aat_int32       ReplySize,                   /*I*/
+                                                        TDigipassBlob   *DPData,                     /*O*/
+                                                        aat_ascii       *ConfirmationCode,           /*O*/
+                                                        aat_int32       *ConfirmationCodeLength);  /*I/O*/
+
+/*********************************************************************/
+/* HSM Replacement functions for AAL2VerifyAll                       */
+/*********************************************************************/
+VDS_EXPORT(aat_int32) AAL2GenVerifyAllCmd(aat_byte      *Cmd,
+                                          aat_int32     *CmdSize,
+                                          TDigipassBlob *DPData,
+                                          TKernelParms  *CallParms,
+                                          aat_ascii     *aStorageKeyNameIn,
+                                          aat_ascii     *aIVIn,
+                                          aat_ascii     *aResponseIn,
+                                          aat_ascii      DataField[10][20],
+                                          aat_int32      FieldCountIn,
+                                          aat_int32      TimeValueIn,
+                                          aat_word32     EventValueIn);
+
+VDS_EXPORT(aat_int32) AAL2ProcVerifyAllRpl(aat_byte      *InReply,
+                                           aat_int32      ReplySize,
+                                           TDigipassBlob *DPData,
+                                           aat_ascii     *aReturnHostCodeOut,
+                                           aat_int32     *ReturnHostCodeLenOut);
+
+VDS_EXPORT(aat_int32) AAL2GenVerifyAllEsCmd(aat_byte      *Cmd,
+                                            aat_int32     *CmdSize,
+                                            TDigipassBlob *DPData,
+                                            TKernelParms  *CallParms,
+                                            aat_ascii     *aStorageKeyNameIn,
+                                            aat_ascii     *aIVIn,
+                                            aat_ascii     *aResponseIn,
+                                            aat_ascii     *DataField[10],
+                                            aat_int32     FieldCountIn,
+                                            aat_int32     TimeValueIn,
+                                            aat_word32    EventValueIn,
+                                            aat_ascii     *aServerPublicKey);
+
+VDS_EXPORT(aat_int32) AAL2ProcVerifyAllEsRpl(aat_byte      *InReply,
+                                             aat_int32      ReplySize,
+                                             TDigipassBlob *DPData,
+                                             aat_ascii     *aReturnHostCodeOut,
+                                             aat_int32     *ReturnHostCodeLenOut);
+
+
 /*********************************************************************/
 /* HSM Replacement functions for AAL2ChangeStaticPassword            */
 /*********************************************************************/
 
-VDS_EXPORT(aat_int32) AAL2GenChangeStaticPasswordCmd(aat_byte      *InCmd,
+VDS_EXPORT(aat_int32) AAL2GenChangeStaticPasswordCmd(aat_byte      *Cmd,
                                                      aat_int32     *CmdSize,
                                                      TDigipassBlob *DPData,
                                                      TKernelParms  *CallParms,
                                                      aat_ascii     *NewStaticPassword1,
                                                      aat_ascii     *NewStaticPassword2);
 
-VDS_EXPORT(aat_int32) AAL2GenChangeStaticPasswordCmdEx(aat_byte      *InCmd,
+VDS_EXPORT(aat_int32) AAL2GenChangeStaticPasswordCmdEx(aat_byte      *Cmd,
                                                        aat_int32     *CmdSize,
                                                        TDigipassBlob *DPData,
                                                        TKernelParms  *CallParms,
@@ -2263,12 +2572,12 @@ VDS_EXPORT(aat_int32) AAL2ProcChangeStaticPasswordRpl(aat_byte      *InReply,
 /* HSM Replacement functions for AAL2ResetStaticPassword             */
 /*********************************************************************/
 
-VDS_EXPORT(aat_int32) AAL2GenResetStaticPasswordCmd(aat_byte      *InCmd,
+VDS_EXPORT(aat_int32) AAL2GenResetStaticPasswordCmd(aat_byte      *Cmd,
                                                     aat_int32     *CmdSize,
                                                     TDigipassBlob *DPData,
                                                     TKernelParms  *CallParms);
 
-VDS_EXPORT(aat_int32) AAL2GenResetStaticPasswordCmdEx(aat_byte      *InCmd,
+VDS_EXPORT(aat_int32) AAL2GenResetStaticPasswordCmdEx(aat_byte      *Cmd,
                                                       aat_int32     *CmdSize,
                                                       TDigipassBlob *DPData,
                                                       TKernelParms  *CallParms,
@@ -2283,13 +2592,13 @@ VDS_EXPORT(aat_int32) AAL2ProcResetStaticPasswordRpl(aat_byte      *InReply,
 /* HSM Replacement functions for AAL2Unlock                          */
 /*********************************************************************/
 
-VDS_EXPORT(aat_int32) AAL2GenUnlockCmd(aat_byte      *InCmd,
+VDS_EXPORT(aat_int32) AAL2GenUnlockCmd(aat_byte      *Cmd,
                                        aat_int32     *CmdSize,
                                        TDigipassBlob *DPData,
                                        TKernelParms  *CallParms,
                                        aat_ascii     *aRandomNumberIn);
 
-VDS_EXPORT(aat_int32) AAL2GenUnlockCmdEx(aat_byte      *InCmd,
+VDS_EXPORT(aat_int32) AAL2GenUnlockCmdEx(aat_byte      *Cmd,
                                          aat_int32     *CmdSize,
                                          TDigipassBlob *DPData,
                                          TKernelParms  *CallParms,
@@ -2307,13 +2616,13 @@ VDS_EXPORT(aat_int32) AAL2ProcUnlockRpl(aat_byte      *InReply,
 /* HSM Replacement functions for AAL2GenUnlockAuthCode               */
 /*********************************************************************/
 
-VDS_EXPORT(aat_int32) AAL2GenUnlockAuthCodeCmd(aat_byte      *InCmd,
+VDS_EXPORT(aat_int32) AAL2GenUnlockAuthCodeCmd(aat_byte      *Cmd,
                                                aat_int32     *CmdSize,
                                                TDigipassBlob *DPData,
                                                TKernelParms  *CallParms,
                                                aat_int32      UnlockAuthIndex);
 
-VDS_EXPORT(aat_int32) AAL2GenUnlockAuthCodeCmdEx(aat_byte      *InCmd,
+VDS_EXPORT(aat_int32) AAL2GenUnlockAuthCodeCmdEx(aat_byte      *Cmd,
                                                  aat_int32     *CmdSize,
                                                  TDigipassBlob *DPData,
                                                  TKernelParms  *CallParms,
@@ -2332,14 +2641,14 @@ VDS_EXPORT(aat_int32) AAL2ProcUnlockAuthCodeRpl(aat_byte      *InReply,
 /* HSM Replacement functions for AAL2AuthorizeUnlock                 */
 /*********************************************************************/
 
-VDS_EXPORT(aat_int32) AAL2GenAuthorizeUnlockCmd(aat_byte      *InCmd,
+VDS_EXPORT(aat_int32) AAL2GenAuthorizeUnlockCmd(aat_byte      *Cmd,
                                                 aat_int32     *CmdSize,
                                                 TDigipassBlob *DPData,
                                                 TKernelParms  *CallParms,
                                                 aat_ascii     *aUnlockAuthCodeIn,
                                                 aat_ascii     *aRandomNumberIn);
 
-VDS_EXPORT(aat_int32) AAL2GenAuthorizeUnlockCmdEx(aat_byte      *InCmd,
+VDS_EXPORT(aat_int32) AAL2GenAuthorizeUnlockCmdEx(aat_byte      *Cmd,
                                                 aat_int32     *CmdSize,
                                                 TDigipassBlob *DPData,
                                                 TKernelParms  *CallParms,
@@ -2358,7 +2667,7 @@ VDS_EXPORT(aat_int32) AAL2ProcAuthorizeUnlockRpl(aat_byte      *InReply,
 /* HSM Replacement functions for AAL2SyncTokenAndHost                */
 /*********************************************************************/
 
-VDS_EXPORT(aat_int32) AAL2GenSyncTokenAndHostCmdEx( aat_byte      *InCmd,
+VDS_EXPORT(aat_int32) AAL2GenSyncTokenAndHostCmdEx( aat_byte      *Cmd,
                                                     aat_int32     *CmdSize,
                                                     TDigipassBlob *DPData,
                                                     TKernelParms  *CallParms,
@@ -2370,7 +2679,7 @@ VDS_EXPORT(aat_int32) AAL2GenSyncTokenAndHostCmdEx( aat_byte      *InCmd,
                                                     aat_ascii     *aChallenge2In);
 
 
-VDS_EXPORT(aat_int32) AAL2GenSyncTokenAndHostCmd( aat_byte      *InCmd,
+VDS_EXPORT(aat_int32) AAL2GenSyncTokenAndHostCmd( aat_byte      *Cmd,
                                                   aat_int32     *CmdSize,
                                                   TDigipassBlob *DPData,
                                                   TKernelParms  *CallParms,
@@ -2387,18 +2696,18 @@ VDS_EXPORT(aat_int32) AAL2ProcSyncTokenAndHostRpl(aat_byte      *InReply,
 /* HSM Replacement functions for AAL2MigrateBlob                     */
 /*********************************************************************/
 
-VDS_EXPORT(aat_int32) AAL2GenMigrateBlobCmd(aat_byte      *InCmd,
+VDS_EXPORT(aat_int32) AAL2GenMigrateBlobCmd(aat_byte      *Cmd,
                                             aat_int32     *CmdSize,
                                             TDigipassBlob *DPData,
                                             TKernelParms  *CallParms);
 
-VDS_EXPORT(aat_int32) AAL2GenMigrateBlobCmdEx(aat_byte      *InCmd,
+VDS_EXPORT(aat_int32) AAL2GenMigrateBlobCmdEx(aat_byte      *Cmd,
                                               aat_int32     *CmdSize,
                                               TDigipassBlob *DPData,
                                               TKernelParms  *CallParms,
                                               aat_ascii     *aDecryptionKeyNameIn,
                                               aat_ascii     *aDecryptionIVIn,
-                                              aat_ascii     *aSK_KCV,
+                                              aat_ascii     *aTransportKeyKCVIn,
                                               aat_ascii     *aEncryptionKeyNameIn,
                                               aat_ascii     *aEncryptionIVIn);
 
@@ -2409,7 +2718,7 @@ VDS_EXPORT(aat_int32) AAL2ProcMigrateBlobRpl(aat_byte      *InReply,
 
 
 
-  VDS_EXPORT(aat_int32) AAL2TestGenPassword(TDigipassBlob *DPData,
+VDS_EXPORT(aat_int32) AAL2TestGenPassword(TDigipassBlob *DPData,
                                             TKernelParms  *CallParms,
                                             aat_ascii     *Response,
                                             aat_ascii     *Challenge,
@@ -2417,7 +2726,11 @@ VDS_EXPORT(aat_int32) AAL2ProcMigrateBlobRpl(aat_byte      *InReply,
                                             aat_ascii     *ReturnHostCode,
                                             aat_int32     *ReturnHostCodeLength);
 
-  VDS_EXPORT(aat_int32) AAL2GenHashDataBlock(TDigipassBlob *DPData,
+/*********************************************************************/
+/* Functions used for VC Offline Module                              */
+/*********************************************************************/
+
+VDS_EXPORT(aat_int32) AAL2GenHashDataBlock(TDigipassBlob *DPData,
                                              TKernelParms  *CallParms,
                                              aat_int32		EventWindow,
                                              aat_int32		StartTime,
@@ -2441,20 +2754,6 @@ VDS_EXPORT(aat_int32)  AAL2GetStateDataBlock(
                                 TKernelParms	*CallParms,
                                 aat_byte	    *bStateDataBlock,
                                 aat_int32	    *StateDataBlockLength );
-
-VDS_EXPORT(aat_int32) VerifyPassword
-(
-TKernelParms		*CallParms,
-aat_ascii		    *aPassword,
-aat_byte		    *bSalt,
-aat_int32		    SaltLength,
-aat_byte		    *bStateDataBlock,
-aat_int32		    StateDataBlockLength,
-aat_byte		    *bHashDataBlock,
-aat_int32		    HashDataBlockLength,
-aat_byte		    *bKey,
-aat_int32		    *KeyLength);
-
 
 /*********************************************************************/
 /* Functions used for DP4WEB                                         */
@@ -2491,7 +2790,7 @@ VDS_EXPORT(aat_int32)AAL2GenActivationCodeEx( TDigipassBlob   *DPData,
                                               aat_ascii       *aStaticVectorIn,
                                               aat_ascii       *aSharedData,
                                               aat_ascii       *aAlea,
-                                              aat_int32       *ActivationCodeFormat,
+                                              aat_int32       *ActivationFlags,
                                               aat_ascii       *aSerialNumberSuffix,
                                               aat_ascii       *aXFAD);
 
@@ -2501,44 +2800,55 @@ VDS_EXPORT(aat_int32)AAL2GenActivationCodeExHSM(void            *pHSMContext,
                                                 aat_ascii       *aStaticVectorIn,
                                                 aat_ascii       *aSharedData,
                                                 aat_ascii       *aAlea,
-                                                aat_int32       *ActivationCodeFormat,
+                                                aat_int32       *ActivationFlags,
                                                 aat_ascii       *aSerialNumberSuffix,
                                                 aat_ascii       *aXFAD);
 
-VDS_EXPORT(aat_int32)AAL2GenActivationCodeXErc(	TDigipassBlob   *DPData [8],
+VDS_EXPORT(aat_int32)AAL2GenActivationCodeXErc(	TDigipassBlob   *DPData[8],
                              					aat_int16        Appl_count,
 												TKernelParms    *CallParms,
 												aat_ascii       *aStaticVectorIn,
 												aat_ascii       *aSharedData,
 												aat_ascii       *aAlea,
-												aat_int32       *ActivationCodeFormat,
+												aat_int32       *ActivationFlags,
 												aat_ascii       *aSerialNumberSuffix,
 												aat_ascii       *aXFAD,
 												aat_ascii       *aXERC);
 
-/* use for dotnet wrapper only*/
-VDS_EXPORT(aat_int32) AAL2GenActivationCodeXErcEx(aat_byte       bDPData[8*TDigipassBlobSize],
-												  aat_int16		 Appl_Count,
-                                          		  TKernelParms    *CallParms,
-	                                      		  aat_ascii       *aStaticVectorIn,
-	                                      		  aat_ascii       *aSharedData,
-	                                      		  aat_ascii       *aAlea,
-	                                      		  aat_int32       *ActivationCodeFormat,
-	                                      		  aat_ascii       *aSerialNumberSuffix,
-	                                      		  aat_ascii       *aActivationCode,
-										  		  aat_ascii       *aXERC);
-
 VDS_EXPORT(aat_int32)AAL2GenActivationCodeXErcHSM(	void            *pHSMContext,
-													TDigipassBlob   *DPData [8],
+													TDigipassBlob   *DPData[8],
                              						aat_int16        Appl_count,
 													TKernelParms    *CallParms,
 													aat_ascii       *aStaticVectorIn,
 													aat_ascii       *aSharedData,
 													aat_ascii       *aAlea,
-													aat_int32       *ActivationCodeFormat,
+													aat_int32       *ActivationFlags,
 													aat_ascii       *aSerialNumberSuffix,
 													aat_ascii       *aXFAD,
 													aat_ascii       *aXERC);
+
+VDS_EXPORT(aat_int32)AAL2GenActivationDataRndKey(   TDigipassBlob   *DPData[8],
+                                                    aat_int16		 Appl_Count,
+                                                    TKernelParms    *CallParms,
+                                                    aat_ascii       *aStaticVectorIn,
+                                                    aat_ascii       *aSharedData,
+                                                    aat_ascii       *aAlea,
+                                                    aat_int32       ActivationFlags,
+                                                    aat_ascii       *aSerialNumberSuffix,
+                                                    aat_ascii       *aXFAD,
+                                                    aat_ascii       *aXERC);
+
+VDS_EXPORT(aat_int32)AAL2GenActivationDataRndKeyHSM(void            *HSMsession,
+                                                    TDigipassBlob   *DPData[8],
+                                                    aat_int16		 Appl_Count,
+                                                    TKernelParms    *CallParms,
+                                                    aat_ascii       *aStaticVectorIn,
+                                                    aat_ascii       *aSharedData,
+                                                    aat_ascii       *aAlea,
+                                                    aat_int32       ActivationFlags,
+                                                    aat_ascii       *aSerialNumberSuffix,
+                                                    aat_ascii       *aXFAD,
+                                                    aat_ascii       *aXERC);
 
 VDS_EXPORT(aat_int32)AAL2GenQAKey( aat_ascii       *aQAIndexList,
                                    aat_ascii       *aQAHashData,
@@ -2546,9 +2856,10 @@ VDS_EXPORT(aat_int32)AAL2GenQAKey( aat_ascii       *aQAIndexList,
                                    aat_ascii       aQAKey[33]);
 
 /*********************************************************************/
-/* HSM Replacement functions for AAL2GenActivationCodeEx             */
+/* (Deprecated, this function must not be used)                      */
+/* Returns 1100 "Function not supported"                             */
 /*********************************************************************/
-VDS_EXPORT(aat_int32) AAL2GenGenActivationCodeExCmd(aat_byte      *InCmd,
+VDS_EXPORT(aat_int32) AAL2GenGenActivationCodeExCmd(aat_byte      *Cmd,
                                                     aat_int32     *CmdSize,
                                                     TDigipassBlob *DPData,
                                                     TKernelParms  *CallParms,
@@ -2557,23 +2868,24 @@ VDS_EXPORT(aat_int32) AAL2GenGenActivationCodeExCmd(aat_byte      *InCmd,
 	                                                aat_ascii     *aStaticVectorIn,
 	                                                aat_ascii     *aSharedData,
 	                                                aat_ascii     *aAlea,
-	                                                aat_int32     *ActivationCodeFormat);
+	                                                aat_int32     *ActivationFlags);
 
 
 VDS_EXPORT(aat_int32) AAL2ProcGenActivationCodeExRpl( aat_byte      *InReply,
                                                       aat_int32      ReplySize,
                                                       TDigipassBlob *DPData,
-                                                      aat_int32     *ActivationCodeFormat,
+                                                      aat_int32     *Reserved,
                                                       aat_ascii     *aSerialNumberSuffixOut,
                                                       aat_ascii     *aXFADOut);
 
 /*********************************************************************/
-/* HSM Replacement functions for AAL2GenActivationCodeXErc           */
+/* (Deprecated, this function must not be used)                      */
+/* Returns 1100 "Function not supported"                             */
 /*********************************************************************/
 
-VDS_EXPORT(aat_int32)AAL2GenGenActivationCodeXErcCmd(	aat_byte        *InCmd,
+VDS_EXPORT(aat_int32)AAL2GenGenActivationCodeXErcCmd(	aat_byte        *Cmd,
 														aat_int32       *CmdSize,
-														TDigipassBlob   *DPData [8],
+														TDigipassBlob   *DPData[8],
                              							aat_int16        Appl_count,
 														TKernelParms    *CallParms,
 														aat_ascii		*aStorageKeyNameIn,
@@ -2581,22 +2893,24 @@ VDS_EXPORT(aat_int32)AAL2GenGenActivationCodeXErcCmd(	aat_byte        *InCmd,
 														aat_ascii       *aStaticVectorIn,
 														aat_ascii       *aSharedData,
 														aat_ascii       *aAlea,
-														aat_int32       *ActivationCodeFormat,
+														aat_int32       *ActivationFlags,
 														aat_int32       XERCFlag);
 
 VDS_EXPORT(aat_int32)AAL2ProcGenActivationCodeXErcRpl(  aat_byte      *InReply,
 														aat_int32      ReplySize,
 														TDigipassBlob *DPData[8],
-														aat_int32     *ActivationCodeFormat,
+														aat_int32     *Reserved,
 														aat_ascii     *aSerialNumberSuffixOut,
 														aat_ascii     *aXFADOut,
 														aat_ascii     *aXERCOut);
 
+/*********************************************************************/
+/* HSM Replacement functions for AAL2GenActivationDataRndKey         */
+/*********************************************************************/
 
-/* use for dotnet wrapper only*/
-VDS_EXPORT(aat_int32)AAL2GenGenActivationCodeXErcExCmd(	aat_byte        *InCmd,
+VDS_EXPORT(aat_int32)AAL2GenGenActivationDataRndKeyCmd(	aat_byte        *InCmd,
 														aat_int32       *CmdSize,
-														aat_byte         bDPData[8*TDigipassBlobSize],
+														TDigipassBlob   *DPData[8],
                              							aat_int16        Appl_count,
 														TKernelParms    *CallParms,
 														aat_ascii		*aStorageKeyNameIn,
@@ -2604,25 +2918,22 @@ VDS_EXPORT(aat_int32)AAL2GenGenActivationCodeXErcExCmd(	aat_byte        *InCmd,
 														aat_ascii       *aStaticVectorIn,
 														aat_ascii       *aSharedData,
 														aat_ascii       *aAlea,
-														aat_int32       *ActivationCodeFormat,
-														aat_int32       XERCFlag);
+														aat_int32       ActivationFlags);
 
-/* use for dotnet wrapper only*/
-VDS_EXPORT(aat_int32)AAL2ProcGenActivationCodeXErcExRpl(aat_byte      *InReply,
-														aat_int32      ReplySize,
-														aat_byte       bDPData[8*TDigipassBlobSize],
-														aat_int32     *ActivationCodeFormat,
-														aat_ascii     *aSerialNumberSuffixOut,
-														aat_ascii     *aXFADOut,
-														aat_ascii     *aXERCOut);
+VDS_EXPORT(aat_int32)AAL2ProcGenActivationDataRndKeyRpl(aat_byte        *InReply,
+														aat_int32       ReplySize,
+														TDigipassBlob   *DPData[8],
+														aat_ascii       *aSerialNumberSuffixOut,
+														aat_ascii       *aXFADOut,
+														aat_ascii       *aXERCOut);
 
 
 /*********************************************************************/
 /* HSM Replacement functions for AAL2QADecryptQABlob                 */
 /*********************************************************************/
-VDS_EXPORT(aat_int32) AAL2GenQADecryptQABlobCmd(aat_byte	  *InCmd,
+VDS_EXPORT(aat_int32) AAL2GenQADecryptQABlobCmd(aat_byte	  *Cmd,
 											    aat_int32	  *CmdSize,
-												TDigipassBlob *DPBlob,
+												TDigipassBlob *DPData,
 												TKernelParms  *CallParms,
 												aat_ascii	  *aStorageKeyNameIn,
 												aat_ascii	  *aIVIn,
@@ -2631,12 +2942,12 @@ VDS_EXPORT(aat_int32) AAL2GenQADecryptQABlobCmd(aat_byte	  *InCmd,
 
 VDS_EXPORT(aat_int32) AAL2ProcQADecryptQABlobRpl(   aat_byte      *InReply,
                                                     aat_int32      ReplySize,
-                                                    TDigipassBlob *DPDBlob,
+                                                    TDigipassBlob *DPData,
                                                     aat_ascii     *aQABlobOut,
-                                                    aat_int32     *QABlobSizeOut);
+                                                    aat_int32     *QABlobSize);
 
 /*********************************************************************/
-/* Generate Digipass Blob From TLV                                   */
+/* Generate DIGIPASS application BLOB From TLV (VC for ICSF)         */
 /*********************************************************************/
 VDS_EXPORT(aat_int32) AAL2GenDPBlobHSM(void           *pHSMContext,
                                        TDigipassBlob  *DPData,
@@ -2651,9 +2962,427 @@ VDS_EXPORT(aat_int32) AAL2GenDPBlobHSM(void           *pHSMContext,
                                        aat_byte       *TLVData,
                                        aat_int32       nTLVDataLength);
 
+/*********************************************************************/
+/* Get Diversifier from DerivationCode and store it in the blobs     */
+/*********************************************************************/
+VDS_EXPORT(aat_int32) AAL2DeriveTokenBlobs( TDigipassBlob  *DPData[8],
+                                            TKernelParms   *CallParms,
+                                            aat_int16       Appl_count,
+                                            aat_ascii      *Challenge,
+                                            aat_ascii      *DerivationCode,
+                                            aat_word32      DerivationCodeFormat);
+
+VDS_EXPORT(aat_int32) AAL2DeriveTokenBlobsHSM( void            *pHSMContext,
+                                               TDigipassBlob*  DPData[8],
+                                               TKernelParms*   CallParms,
+                                               aat_int16       Appl_count,
+                                               aat_ascii*      Challenge,
+                                               aat_ascii*      DerivationCode,
+                                               aat_word32      DerivationCodeFormat);
+
+
+VDS_EXPORT(aat_int32) AAL2GenDeriveTokenBlobsCmd ( aat_byte*	   Cmd,
+                                                   aat_int32*	   CmdSize,
+                                                   TDigipassBlob*  DPData[8],
+                                                   TKernelParms*   CallParms,
+                                                   aat_int16       Appl_count,
+                                                   aat_ascii*      aStorageKeyNameIn,
+                                                   aat_ascii*      aIVIn,
+                                                   aat_ascii*      aChallengeIn,
+                                                   aat_ascii*      aDerivationCodeIn,
+                                                   aat_word32      DerivationCodeFormat);
+
+VDS_EXPORT(aat_int32) AAL2ProcDeriveTokenBlobsRpl (aat_byte*	   InReply,
+                                                   aat_int32	   ReplySize,
+                                                   TDigipassBlob*  DPData[8]);
+
+#ifdef _ICSF
+VDS_EXPORT(aat_int32)AAL2VerifyAllICSF(TDigipassBlob    *pDPData,
+                                       TKernelParms     *pCallParms,
+                                       aat_ascii        *aStorageKey,
+                                       aat_ascii        *aInitialVector,
+                                       aat_ascii        *aResponseIn,
+                                       aat_ascii        aDataField[10][20],
+                                       aat_int32        FieldCount,
+                                       aat_int32        TimeValueIn,
+                                       aat_word32       EventValueIn,
+                                       aat_ascii        *aReturnHostCodeOut,
+                                       aat_int32        *ReturnHostCodeLenOut);
+
+VDS_EXPORT(aat_int32)AAL2VerifyPasswordICSF( TDigipassBlob *pDPData,
+                                              TKernelParms  *pCallParms,
+                                              aat_ascii     *aStorageKey,
+                                              aat_ascii     *aInitialVector,
+                                              aat_ascii     *aResponseIn,
+                                              aat_ascii     *aChallengeIn,
+                                              aat_ascii     *aReturnHostCode,
+                                              aat_int32     *ipReturnHostCodeLen);
+
+VDS_EXPORT(aat_int32) AAL2VerifySignatureICSF(TDigipassBlob *pDPData,
+                                               TKernelParms  *pCallParms,
+                                               aat_ascii     *aStorageKey,
+                                               aat_ascii     *aInitialVector,
+                                               aat_ascii     *aSignature,
+                                               aat_ascii      aSignedDataFields[8][20],
+                                               aat_int32      iFieldCount,
+                                               aat_int32      iDeferredSignatureData,
+                                               aat_ascii     *aConfirmationCode,
+                                               aat_int32     *ipConfirmationCodeLength);
+
+VDS_EXPORT(aat_int32) AAL2ChangeStaticPasswordICSF(TDigipassBlob *pDPData,
+                                                   TKernelParms  *pCallParms,
+                                                   aat_ascii     *aStorageKey,
+                                                   aat_ascii     *aInitialVector,
+                                                   aat_ascii     *aNewStaticPassword1,
+                                                   aat_ascii     *aNewStaticPassword2);
+
+VDS_EXPORT(aat_int32) AAL2ResetStaticPasswordICSF (TDigipassBlob *pDPData,
+                                                    TKernelParms  *pCallParms,
+                                                    aat_ascii     *aStorageKey,
+                                                    aat_ascii     *aInitialVector);
+
+VDS_EXPORT(aat_int32) AAL2UnlockICSF(TDigipassBlob *pDPData,
+                                      TKernelParms  *pCallParms,
+                                      aat_ascii     *aStorageKey,
+                                      aat_ascii     *aInitialVector,
+                                      aat_ascii     *aRandomNumber,
+                                      aat_ascii     *aUnlockCode);
+
+VDS_EXPORT(aat_int32) AAL2MigrateBlobICSF( TDigipassBlob *pDPData,
+                                         TKernelParms  *pCallParms,
+                                         aat_ascii     *aOldStorageKey,
+                                         aat_ascii     *aOldInitialVector,
+                                         aat_ascii     *aNewStorageKey,
+                                         aat_ascii     *aNewInitialVector);
+
+VDS_EXPORT(aat_int32) AAL2MigrateBlobICSFEx( TDigipassBlob *pDPData,
+                                             TKernelParms  *pCallParms,
+                                             aat_ascii     *aTransportKey,
+                                             aat_ascii     *aTransportKeyKCV,
+                                             aat_ascii     *aStorageKey,
+                                             aat_ascii     *aInitialVector);
+
+VDS_EXPORT(aat_int32) AAL2SyncTokenAndHostICSF(TDigipassBlob *pDPData,
+                                               TKernelParms  *pCallParms,
+                                               aat_ascii     *aStorageKey,
+                                               aat_ascii     *aInitialVector,
+                                               aat_ascii     *aResponse1In,
+                                               aat_ascii     *aChallenge1In,
+                                               aat_ascii     *aResponse2In,
+                                               aat_ascii     *aChallenge2In);
+
+/* new functions added as of version 3.11.2.0 */
+
+VDS_EXPORT(aat_int32) AAL2AuthorizeUnlockICSF(TDigipassBlob *pDPData,
+                                              TKernelParms  *pCallParms,
+                                              aat_ascii     *aStorageKey,
+                                              aat_ascii     *aInitialVector,
+                                              aat_ascii     *aAuthenticationCode,
+                                              aat_ascii     *RandomNumber,
+                                              aat_ascii     *aUnlockCode);
+
+VDS_EXPORT(aat_int32) AAL2DeriveTokenBlobsICSF(TDigipassBlob    *pDPData[8],
+                                               aat_int16        iAppl_count,
+                                               TKernelParms     *pCallParms,
+                                               aat_ascii        *aStorageKey,
+                                               aat_ascii        *aInitialVector,
+                                               aat_ascii        *aChallenge,
+                                               aat_ascii        *aDerivationCode,
+                                               aat_word32       iDerivationCodeFormat);
+
+VDS_EXPORT(aat_int32) AAL2GenActivationDataRndKeyICSF(TDigipassBlob   *pDPData[8],
+                                                      aat_int16       iAppl_Count,
+                                                      TKernelParms    *pCallParms,
+                                                      aat_ascii       *aStorageKey,
+                                                      aat_ascii       *aInitialVector,
+                                                      aat_ascii       *aStaticVectorIn,
+                                                      aat_ascii       *aSharedData,
+                                                      aat_ascii       *aAlea,
+                                                      aat_int32       iActivationFlags,
+                                                      aat_ascii       *aSerialNumberSuffix,
+                                                      aat_ascii       *aActivationCode,
+                                                      aat_ascii       *aXERC);
+
+VDS_EXPORT(aat_int32) AAL2GenPasswordICSF(TDigipassBlob *pDPData,
+                                          TKernelParms  *aCallParms,
+                                          aat_ascii     *aStorageKey,
+                                          aat_ascii     *aInitialVector,
+                                          aat_ascii     *aResponse,
+                                          aat_ascii     *aChallenge,
+                                          aat_ascii	    *aReturnHostCode,
+                                          aat_int32	    *piReturnHostCodeLength);
+
+VDS_EXPORT(aat_int32) AAL2GenSignatureICSF(TDigipassBlob    *pDPData,
+                                           TKernelParms     *pCallParms,
+                                           aat_ascii        *aStorageKey,
+                                           aat_ascii        *aInitialVector,
+                                           aat_ascii		*Signature,
+                                           aat_ascii		SignedDataFields[8][20],
+                                           aat_int32		iFieldCount,
+                                           aat_int32		iDeferredSignatureDate,
+                                           aat_ascii		*aConfirmationCode,
+                                           aat_int32		*piConfirmationCodeLength);
+
+VDS_EXPORT(aat_int32) AAL2GenUnlockAuthCodeICSF( TDigipassBlob *pDPData,
+                                                 TKernelParms  *pCallParms,
+                                                 aat_ascii     *aStorageKey,
+                                                 aat_ascii     *aInitialVector,
+                                                 aat_int32     iUnlockAuthIndex,
+                                                 aat_ascii     *aUnlockAuthCode,
+                                                 aat_int32     *piUnlockAuthCounter);
+
+VDS_EXPORT(aat_int32) AAL2QADecryptQABlobICSF(TDigipassBlob   *pDPData,
+                                              TKernelParms    *pCallParms,
+                                              aat_ascii       *aStorageKey,
+                                              aat_ascii       *aInitialVector,
+                                              aat_ascii       *aChallenge,
+                                              aat_ascii       *aEncryptedQABlob,
+                                              aat_ascii       *aQABlob,
+                                              aat_int32       *piQABlobSize);
+
+#endif /*_ICSF*/
+
+/********************************************************************/
+/* New VACMAN Controler 3.13.0 DIGIPASS post-provisioning and       */
+/* secure channel.                                                  */
+/********************************************************************/
+
+/*********************************************************************/
+/* DPX Import enhancement                                            */
+/*********************************************************************/
+
+VDS_EXPORT(aat_int32) AAL2DPXGetTokenBlobsEx(   TDPXHandle    *dpx_Handle,
+                                                TKernelParms  *CallParms,
+                                                aat_int16     *appli_count,
+                                                aat_ascii     Serial_Appli[8][23],
+                                                aat_ascii     TokenType [6],
+                                                aat_ascii     Authmode[8][3],
+                                                TDigipassBlob DPData[8],
+                                                aat_int32     *pSeqNumThreshold,
+                                                aat_ascii     *ActivationVector,
+                                                aat_int32     *pActivationVectorLen);
+
+VDS_EXPORT(aat_int32) AAL2DPXGetMessageVector( TDPXHandle    *dpx_Handle,
+                                               TKernelParms  *CallParms,
+                                               aat_ascii     *MessageVector,
+                                               aat_int32     *MessageVectorLen);
+
+/*********************************************************************/
+/* New post-provisioning functions                                   */
+/*********************************************************************/
+
+VDS_EXPORT(aat_int32) AAL2GenMessageActivation1(    TDigipassBlob   *DPMAData,                    /*I*/
+                                                    TKernelParms    *CallParms,                   /*I*/
+                                                    aat_ascii       *Challenge,                   /*I*/
+                                                    aat_ascii       *StaticVector,                /*I*/
+                                                    aat_ascii       *MessageVector,               /*I*/
+                                                    aat_ascii       *ActivationVector,            /*I*/
+                                                    aat_ascii       *Activation1Message,          /*O*/
+                                                    aat_int32       *Activation1MessageLength); /*I/O*/
+
+VDS_EXPORT(aat_int32) AAL2VerifyDeviceCode(     TDigipassBlob   *DPMAData,              /*I/O*/
+                                                TKernelParms    *CallParms,               /*I*/
+                                                aat_ascii       *Challenge,               /*I*/
+                                                aat_ascii       *DeviceCode,              /*I*/
+                                                aat_ascii       *DeviceID,                /*O*/
+                                                aat_int32       *DeviceIDLength,        /*I/O*/
+                                                aat_int32       *pDeviceType);            /*O*/
+
+VDS_EXPORT(aat_int32) AAL2VerifyDeviceCodeHSM(  void            *pHSMContext,
+                                                TDigipassBlob   *DPMAData,              /*I/O*/
+                                                TKernelParms    *CallParms,               /*I*/
+                                                aat_ascii       *Challenge,               /*I*/
+                                                aat_ascii       *DeviceCode,              /*I*/
+                                                aat_ascii       *DeviceID,                /*O*/
+                                                aat_int32       *DeviceIDLength,        /*I/O*/
+                                                aat_int32       *pDeviceType);            /*O*/
+
+VDS_EXPORT(aat_int32) AAL2GenPayloadKeyBlob(    TDigipassBlob   *DPMAData,              /*I/O*/
+                                                TKernelParms    *CallParms,               /*I*/
+                                                aat_ascii       *MessageVector,           /*I*/
+                                                aat_ascii       *PKBlob,                  /*O*/
+                                                aat_int32       *PKBlobLength);         /*I/O*/
+
+VDS_EXPORT(aat_int32) AAL2GenPayloadKeyBlobHSM( void            *pHSMContext,
+                                                TDigipassBlob   *DPMAData,              /*I/O*/
+                                                TKernelParms    *CallParms,               /*I*/
+                                                aat_ascii       *MessageVector,           /*I*/
+                                                aat_ascii       *PKBlob,                  /*O*/
+                                                aat_int32       *PKBlobLength);         /*I/O*/
+
+VDS_EXPORT(aat_int32) AAL2GenMessageActivation2(TDigipassBlob   *DPMAData,                   /*I/O*/
+                                                aat_ascii       *PKBlob,                       /*I*/
+                                                TKernelParms    *CallParms,                    /*I*/
+                                                aat_ascii       *StaticVector,                 /*I*/
+                                                aat_ascii       *MessageVector,                /*I*/
+                                                aat_ascii       *DeviceID,                     /*I*/
+                                                aat_int32       *pSeqNum,                      /*O*/
+                                                aat_ascii       TokenType[6],                  /*O*/
+                                                aat_int16       *appli_count,                  /*O*/
+                                                aat_ascii       Serial_Appli [8][23],          /*O*/
+                                                aat_ascii       AuthMode [8][3],               /*O*/
+                                                TDigipassBlob   DPData [8],                    /*O*/
+                                                aat_ascii       *Activation2Message,           /*O*/
+                                                aat_int32       *Activation2MessageLength);  /*I/O*/
+
+VDS_EXPORT(aat_int32) AAL2GenMessageActivation2HSM(void            *pHSMContext,
+                                                TDigipassBlob   *DPMAData,                   /*I/O*/
+                                                aat_ascii       *PKBlob,                       /*I*/
+                                                TKernelParms    *CallParms,                    /*I*/
+                                                aat_ascii       *StaticVector,                 /*I*/
+                                                aat_ascii       *MessageVector,                /*I*/
+                                                aat_ascii       *DeviceID,                     /*I*/
+                                                aat_int32       *pSeqNum,                      /*O*/
+                                                aat_ascii       TokenType[6],                  /*O*/
+                                                aat_int16       *appli_count,                  /*O*/
+                                                aat_ascii       Serial_Appli [8][23],          /*O*/
+                                                aat_ascii       AuthMode [8][3],               /*O*/
+                                                TDigipassBlob   DPData [8],                    /*O*/
+                                                aat_ascii       *Activation2Message,           /*O*/
+                                                aat_int32       *Activation2MessageLength);  /*I/O*/
+
+VDS_EXPORT(aat_int32) AAL2GenMessageRequest (  aat_ascii       *PKBlob,                        /*I*/
+                                               TKernelParms    *CallParms,                     /*I*/
+                                               aat_ascii       *MessageVector,                 /*I*/
+                                               aat_ascii       *RequestBody,                   /*I*/
+                                               aat_ascii       *RequestMessage,                /*O*/
+                                               aat_int32       *RequestMessageLength);       /*I/O*/
+
+VDS_EXPORT(aat_int32) AAL2GenMessageRequestHSM (  void            *pHSMContext,
+                                                  aat_ascii       *PKBlob,                        /*I*/
+                                                  TKernelParms    *CallParms,                     /*I*/
+                                                  aat_ascii       *MessageVector,                 /*I*/
+                                                  aat_ascii       *RequestBody,                   /*I*/
+                                                  aat_ascii       *RequestMessage,                /*O*/
+                                                  aat_int32       *RequestMessageLength);       /*I/O*/
+
+
+VDS_EXPORT(aat_int32) AAL2MigratePKBlob( aat_ascii       *PKBlob,                  /*I/O*/
+                                         TKernelParms    *CallParms,                 /*I*/
+                                         aat_int32       DeriveVector,               /*I*/
+                                         aat_int32       StorageDeriveKey1,          /*I*/
+                                         aat_int32       StorageDeriveKey2,          /*I*/
+                                         aat_int32       StorageDeriveKey3,          /*I*/
+                                         aat_int32       StorageDeriveKey4);         /*I*/
+
+VDS_EXPORT(aat_int32) AAL2MigratePKBlobHSM( void            *pHSMContext,
+                                            aat_ascii       *PKBlob,               /*I/O*/
+                                            TKernelParms    *CallParms);             /*I*/
+
+VDS_EXPORT(aat_int32) AAL2GenMessageDeactivation (  aat_ascii       *PKBlob,                        /*I*/
+                                                    TKernelParms    *CallParms,                     /*I*/
+                                                    aat_ascii       *MessageVector,                 /*I*/
+                                                    aat_int32       SeqNum,                         /*I*/
+                                                    aat_ascii       *DeactivationMessage,           /*O*/
+                                                    aat_int32       *DeactivationMessageLength);   /*I/O*/
+
+VDS_EXPORT(aat_int32) AAL2GenMessageDeactivationHSM (  void            *pHSMContext,
+                                                       aat_ascii       *PKBlob,                        /*I*/
+                                                       TKernelParms    *CallParms,                     /*I*/
+                                                       aat_ascii       *MessageVector,                 /*I*/
+                                                       aat_int32       SeqNum,                         /*I*/
+                                                       aat_ascii       *DeactivationMessage,           /*O*/
+                                                       aat_int32       *DeactivationMessageLength);   /*I/O*/
+
+/*********************************************************************/
+/* HSM-replacement functions for new post-provisioning               */
+/*********************************************************************/
+VDS_EXPORT(aat_int32) AAL2GenVerifyDeviceCodeCmd(   aat_byte        *Cmd,                      /*O*/
+                                                    aat_int32       *CmdSize,			     /*I/O*/
+                                                    TDigipassBlob   *DPMAData,                 /*I*/
+                                                    TKernelParms    *CallParms,                /*I*/
+                                                    aat_ascii       *aStorageKeyNameIn,        /*I*/
+                                                    aat_ascii       *aIVIn,                    /*I*/
+                                                    aat_ascii       *Challenge,                /*I*/
+                                                    aat_ascii       *DeviceCode);              /*I*/
+
+VDS_EXPORT(aat_int32) AAL2ProcVerifyDeviceCodeRpl(  aat_byte        *InReply,                  /*I*/
+                                                    aat_int32       ReplySize,                 /*I*/
+                                                    TDigipassBlob   *DPMAData,                 /*O*/
+                                                    aat_ascii       *DeviceID,                 /*O*/
+                                                    aat_int32       *DeviceIDLength,         /*I/O*/
+                                                    aat_int32       *pDeviceType);             /*O*/
+
+VDS_EXPORT(aat_int32) AAL2GenGenPayloadKeyBlobCmd(  aat_byte        *Cmd,                      /*O*/
+                                                    aat_int32       *CmdSize,			     /*I/O*/
+                                                    TDigipassBlob   *DPMAData,                 /*I*/
+                                                    TKernelParms    *CallParms,                /*I*/
+                                                    aat_ascii       *aStorageKeyNameIn,        /*I*/
+                                                    aat_ascii       *aIVIn,                    /*I*/
+                                                    aat_ascii       *MessageVector);           /*I*/
+
+VDS_EXPORT(aat_int32) AAL2ProcGenPayloadKeyBlobRpl( aat_byte        *InReply,                  /*I*/
+                                                    aat_int32       ReplySize,                 /*I*/
+                                                    TDigipassBlob   *DPMAData,                 /*O*/
+                                                    aat_ascii       *PKBlob,                   /*O*/
+                                                    aat_int32       *PKBlobLength);          /*I/O*/
+
+VDS_EXPORT(aat_int32) AAL2GenGenMessageActivation2Cmd(  aat_byte        *Cmd,                          /*O*/
+                                                        aat_int32       *CmdSize,                    /*I/O*/
+                                                        TDigipassBlob   *DPMAData,                     /*I*/
+                                                        aat_ascii       *PKBlob,                       /*I*/
+                                                        TKernelParms    *CallParms,                    /*I*/
+                                                        aat_ascii       *aStorageKeyNameIn,            /*I*/
+                                                        aat_ascii       *aIVIn,                        /*I*/
+                                                        aat_ascii       *StaticVector,                 /*I*/
+                                                        aat_ascii       *MessageVector,                /*I*/
+                                                        aat_ascii       *DeviceID);                    /*I*/
+
+VDS_EXPORT(aat_int32) AAL2ProcGenMessageActivation2Rpl( aat_byte        *InReply,                      /*I*/
+                                                        aat_int32       ReplySize,                     /*I*/
+                                                        TDigipassBlob   *DPMAData,                     /*O*/
+                                                        aat_int32       *pSeqNum,                      /*O*/
+                                                        aat_ascii       TokenType [6],                 /*O*/
+                                                        aat_int16       *appli_count,                  /*O*/
+                                                        aat_ascii       Serial_Appli [8][23],          /*O*/
+                                                        aat_ascii       AuthMode [8][3],               /*O*/
+                                                        TDigipassBlob   DPData [8],                    /*O*/
+                                                        aat_ascii       *Activation2Message,           /*O*/
+                                                        aat_int32       *Activation2MessageLength);  /*I/O*/
+
+VDS_EXPORT(aat_int32) AAL2GenGenMessageRequestCmd(  aat_byte        *Cmd,                           /*O*/
+                                                    aat_int32       *CmdSize,                     /*I/O*/
+                                                    aat_ascii       *PKBlob,                        /*I*/
+                                                    TKernelParms    *CallParms,                     /*I*/
+                                                    aat_ascii       *aStorageKeyNameIn,             /*I*/
+                                                    aat_ascii       *aIVIn,                         /*I*/
+                                                    aat_ascii       *MessageVector,                 /*I*/
+                                                    aat_ascii       *RequestBody);                  /*I*/
+
+VDS_EXPORT(aat_int32) AAL2ProcGenMessageRequestRpl( aat_byte        *InReply,                      /*I*/
+                                                    aat_int32       ReplySize,                     /*I*/
+                                                    aat_ascii       *RequestMessage,               /*O*/
+                                                    aat_int32       *RequestMessageLength);      /*I/O*/
+
+VDS_EXPORT(aat_int32) AAL2GenGenMessageDeactivationCmd( aat_byte        *Cmd,                           /*O*/
+                                                        aat_int32       *CmdSize,                     /*I/O*/
+                                                        aat_ascii       *PKBlob,                        /*I*/
+                                                        TKernelParms    *CallParms,                     /*I*/
+                                                        aat_ascii       *aStorageKeyNameIn,             /*I*/
+                                                        aat_ascii       *aIVIn,                         /*I*/
+                                                        aat_ascii       *MessageVector,                 /*I*/
+                                                        aat_int32       SeqNum);                        /*I*/
+
+VDS_EXPORT(aat_int32) AAL2ProcGenMessageDeactivationRpl(aat_byte        *InReply,                       /*I*/
+                                                        aat_int32       ReplySize,                      /*I*/
+                                                        aat_ascii       *DeactivationMessage,           /*O*/
+                                                        aat_int32       *DeactivationMessageLength);  /*I/O*/
+
+VDS_EXPORT(aat_int32) AAL2GenMigratePKBlobCmd(  aat_byte        *Cmd,                       /*O*/
+                                                aat_int32       *CmdSize,                 /*I/O*/
+                                                aat_ascii       *PKBlob,                    /*I*/
+                                                TKernelParms    *CallParms,                 /*I*/
+                                                aat_ascii       *DecryptionKeyName,         /*I*/
+                                                aat_ascii       *DecryptionIV,              /*I*/
+                                                aat_ascii       *EncryptionKeyName,         /*I*/
+                                                aat_ascii       *EncryptionIV);             /*I*/
+
+VDS_EXPORT(aat_int32) AAL2ProcMigratePKBlobRpl( aat_byte    *InReply,                   /*I*/
+                                                aat_int32   ReplySize,                  /*I*/
+                                                aat_ascii   *PKBlob );                  /*O*/
+
 #ifdef __cplusplus
 }
-  #endif
+#endif
 
 #endif /* AAL2SDK_H */
-
